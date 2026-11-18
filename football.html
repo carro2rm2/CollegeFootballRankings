@@ -1,274 +1,731 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>College Football National Power Rankings</title>
 <style>
-:root{color-scheme:dark;--panel:#121d30;--line:#263650;--muted:#9fb0c8;--text:#edf3fb;--accent:#62b5ff}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1220,#101c30);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:1220px;margin:0 auto;padding:42px 22px 64px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
-h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(--muted);max-width:850px;margin:0 0 26px}
-.panel{background:rgba(18,29,48,.92);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
-.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input,select,button{background:#0b1526;color:var(--text);border:1px solid #354964;border-radius:9px;padding:11px 13px;font:inherit}input{flex:1;min-width:210px}button{background:#1769aa;border-color:#277fca;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
-#status{color:var(--muted);font-size:13px;margin-top:13px}.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{background:#0b1526;border:1px solid var(--line);border-radius:11px;padding:12px 16px;min-width:140px}.stat strong{display:block;font-size:23px}.stat span{color:var(--muted);font-size:12px}
-.table-wrap{overflow:auto;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:1020px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);position:sticky;top:0;background:#121d30}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.rank{color:var(--accent);font-weight:800}.team{font-weight:650}.tier{color:var(--muted);font-size:13px}
-.note{color:var(--muted);font-size:13px}.note h2{font-size:17px;color:var(--text);margin:0 0 7px}.note p{margin:6px 0}.footer{color:var(--muted);font-size:12px;margin-top:24px}
-@media(max-width:600px){main{padding:28px 14px}.panel{padding:14px}}
+:root {
+  color-scheme: dark;
+  --panel: #121d30;
+  --line: #263650;
+  --muted: #9fb0c8;
+  --text: #edf3fb;
+  --accent: #62b5ff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: linear-gradient(145deg,#0b1220,#101c30);
+  color: var(--text);
+  font: 15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;
+}
+main { max-width: 1220px; margin: 0 auto; padding: 42px 22px 64px; }
+.eyebrow {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+h1 { font-size: clamp(30px,5vw,48px); line-height: 1.08; margin: 10px 0; }
+.sub { color: var(--muted); max-width: 850px; margin: 0 0 26px; }
+.panel {
+  background: rgba(18,29,48,.92);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 18px 0;
+}
+.controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+input,select,button {
+  background: #0b1526;
+  color: var(--text);
+  border: 1px solid #354964;
+  border-radius: 9px;
+  padding: 11px 13px;
+  font: inherit;
+}
+input { flex: 1; min-width: 210px; }
+button {
+  background: #1769aa;
+  border-color: #277fca;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:disabled { opacity: .6; cursor: wait; }
+#status { color: var(--muted); font-size: 13px; margin-top: 13px; }
+.stats { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat {
+  background: #0b1526;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 12px 16px;
+  min-width: 140px;
+}
+.stat strong { display: block; font-size: 23px; }
+.stat span { color: var(--muted); font-size: 12px; }
+.table-wrap { overflow: auto; margin-top: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 1020px; }
+th,td {
+  text-align: left;
+  padding: 12px 13px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  position: sticky;
+  top: 0;
+  background: #121d30;
+}
+td.num,th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.rank { color: var(--accent); font-weight: 800; }
+.team { font-weight: 650; }
+.tier,.note { color: var(--muted); font-size: 13px; }
+.note h2 { font-size: 17px; color: var(--text); margin: 0 0 7px; }
+.note p { margin: 6px 0; }
+.footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+@media(max-width:600px) {
+  main { padding: 28px 14px; }
+  .panel { padding: 14px; }
+}
 </style>
 </head>
-<body><main>
-<div class="eyebrow">Independent model · 2026 season</div>
-<h1>College Football<br>National Power Rankings</h1>
-<p class="sub">A résumé-first national ranking. Signature wins, head-to-head results, recent form and consistency all matter. Notre Dame is treated as a national-level independent rather than being penalized for lacking a conference affiliation.</p>
-<section class="panel">
-<div class="controls">
-<input id="search" type="search" placeholder="Search for a team…" aria-label="Search teams">
-<select id="division" aria-label="Filter division">
-<option value="All">All divisions</option><option>FBS Power Conference</option><option>FBS Independent (Notre Dame)</option><option>FBS Other</option><option>FCS</option><option>Division II</option><option>Division III</option><option>Division II/III</option>
-</select>
-<button id="refresh">Refresh 2026 results</button>
-</div>
-<div id="status" role="status">Loading completed games from CollegeFootballData…</div>
-</section>
-<div class="stats">
-<div class="stat"><strong id="teamCount">—</strong><span>Teams ranked</span></div>
-<div class="stat"><strong id="gameCount">—</strong><span>Completed games included</span></div>
-<div class="stat"><strong id="updated">—</strong><span>Last updated</span></div>
-</div>
-<section class="panel">
-<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Team</th><th>Division / tier</th><th>Conference</th><th class="num">Record</th><th class="num">Power rating</th><th class="num">SOS</th><th class="num">Avg. margin</th><th class="num">Recent form</th><th class="num">H2H points</th></tr></thead><tbody id="rows"><tr><td colspan="10" class="note">No results loaded yet.</td></tr></tbody></table></div>
-</section>
-<section class="panel note">
-<h2>How this version ranks teams</h2>
-<p><b>Division hierarchy:</b> Power-conference FBS teams (and Notre Dame) rank ahead of other FBS, followed by FCS, Division II and Division III. A lower-division team can jump a higher-division opponent only if it has a winning head-to-head record against that specific team. Without a direct result, the division hierarchy holds.</p>
-<p><b>Notre Dame:</b> Notre Dame receives the same top-tier treatment as a Power Conference FBS team. Its ranking is then determined by its actual schedule and results, not a conference label.</p>
-<p><b>Head-to-head:</b> Direct results are a modest tiebreaker, not a season-saving bonus. A win over a comparable team helps, but it cannot erase multiple poor losses.</p>
-<p><b>Recent form:</b> Recent games count more than early-season games. Winning streaks help, but the bonus is capped and cannot erase the full-season record.</p>
-<p><b>Résumé and consistency:</b> Every game matters. Quality wins help, but losses to below-average opponents are penalized more heavily; blowout losses and shutouts carry additional penalties. Margin bonuses for wins are deliberately small, so one big win cannot outweigh a string of poor performances.</p>
-<p>Opponent quality is estimated from an iterative schedule rating. Cross-division comparisons remain less certain when teams have few or no common opponents. This is an independent model, not an official poll.</p>
-</section>
-<div class="footer">Data source: CollegeFootballData API, accessed through a private Cloudflare Worker. This page is an independent, non-commercial project.</div>
+
+<body>
+<main>
+  <div class="eyebrow">Independent model · 2026 season</div>
+  <h1>College Football<br>National Power Rankings</h1>
+  <p class="sub">
+    A résumé-first national ranking. Signature wins, head-to-head results,
+    recent form and consistency all matter. Notre Dame is treated as a
+    national-level independent rather than being penalized for lacking
+    a conference affiliation.
+  </p>
+
+  <section class="panel">
+    <div class="controls">
+      <input id="search" type="search" placeholder="Search for a team…" aria-label="Search teams">
+      <select id="division" aria-label="Filter division">
+        <option value="All">All divisions</option>
+        <option>FBS Power Conference</option>
+        <option>FBS Independent (Notre Dame)</option>
+        <option>FBS Other</option>
+        <option>FCS</option>
+        <option>Division II</option>
+        <option>Division III</option>
+        <option>Division II/III</option>
+      </select>
+      <button id="refresh">Refresh 2026 results</button>
+    </div>
+    <div id="status" role="status">Loading completed games…</div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><strong id="teamCount">—</strong><span>Teams ranked</span></div>
+    <div class="stat"><strong id="gameCount">—</strong><span>Completed games included</span></div>
+    <div class="stat"><strong id="updated">—</strong><span>Last updated</span></div>
+  </div>
+
+  <section class="panel">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Division / tier</th>
+            <th>Conference</th>
+            <th class="num">Record</th>
+            <th class="num">Power rating</th>
+            <th class="num">SOS</th>
+            <th class="num">Avg. margin</th>
+            <th class="num">Recent form</th>
+            <th class="num">H2H points</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="10" class="note">No results loaded yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel note">
+    <h2>How this version ranks teams</h2>
+    <p><b>Division hierarchy:</b> Power-conference FBS teams and Notre Dame rank ahead of other FBS, followed by FCS, Division II and Division III. A lower-division team can jump a higher-division opponent only if it has a winning head-to-head record against that specific team.</p>
+    <p><b>Neutral-field strength:</b> Road wins receive a 3-point résumé advantage over equivalent home wins. Home losses receive an additional 3-point penalty, while road losses receive 3 points of relief. Neutral-site games receive no venue adjustment. The Elo model also accounts for a 55-point home-field advantage.</p>
+    <p><b>Head-to-head:</b> Direct results matter most when teams have comparable records. The bonus considers the venue-adjusted margin, so a road win is stronger evidence of neutral-field superiority than the same win at home. Circular results receive smaller adjustments.</p>
+    <p><b>Recent form:</b> Recent games count more than early-season games. Winning streaks help, but the bonus is capped and cannot erase the full-season record.</p>
+    <p><b>Résumé and consistency:</b> Quality wins help, but losses to below-average opponents are penalized more heavily. Blowout losses and shutouts carry additional penalties. Win-margin bonuses are deliberately small.</p>
+    <p>Opponent quality is estimated from an iterative schedule rating. Cross-division comparisons remain less certain when teams have few or no common opponents. This is an independent model, not an official poll.</p>
+  </section>
+
+  <div class="footer">
+    Data source: CollegeFootballData API, accessed through a Cloudflare Worker.
+    This page is an independent project.
+  </div>
 </main>
+
 <script>
-const API_URL='https://college-football-api.rmcarroll604.workers.dev/games';
-const SEASON=2026;
-const POWER=new Set(['ACC','Atlantic Coast Conference','Big 12','Big Ten','SEC','Southeastern Conference']);
-const $=id=>document.getElementById(id);
-let teams=[];
-function cleanName(s){return String(s||'').replace(/\s+/g,' ').trim();}
-function cleanClassification(s){return String(s||'').toLowerCase().trim();}
-function isNotreDame(name){return /\bnotre dame\b/i.test(String(name||''));}
-function tierFor(classification,conference,name){
- const c=cleanClassification(classification);
- if(c==='fbs'&&isNotreDame(name))return 'FBS Independent (Notre Dame)';
- if(c==='fbs')return POWER.has(conference)?'FBS Power Conference':'FBS Other';
- if(c==='fcs')return 'FCS';
- if(c==='ii')return 'Division II';
- if(c==='iii')return 'Division III';
- if(c==='ii/iii')return 'Division II/III';
- return 'Other';
+const API_URL = 'https://college-football-api.rmcarroll604.workers.dev/games';
+const SEASON = 2026;
+
+const POWER = new Set([
+  'ACC',
+  'Atlantic Coast Conference',
+  'Big 12',
+  'Big Ten',
+  'SEC',
+  'Southeastern Conference'
+]);
+
+const $ = id => document.getElementById(id);
+let teams = [];
+
+function cleanName(s) {
+  return String(s || '').replace(/\s+/g,' ').trim();
 }
-function baseRating(tier){
- if(tier==='FBS Power Conference'||tier==='FBS Independent (Notre Dame)')return 1530;
- if(tier==='FBS Other')return 1515;
- if(tier==='FCS')return 1500;
- return 1485;
-}
-// National division hierarchy: Power FBS, other FBS, FCS, Division II, Division III.
-// A lower-tier team can jump a higher-tier opponent only when it has beaten that
-// opponent head-to-head during this season.
-function tierOrder(tier){
- if(tier==='FBS Power Conference'||tier==='FBS Independent (Notre Dame)')return 0;
- if(tier==='FBS Other')return 1;
- if(tier==='FCS')return 2;
- if(tier==='Division II'||tier==='Division II/III')return 3;
- if(tier==='Division III')return 4;
- return 5;
-}
-function applyDivisionHierarchy(sortedTeams){
- // Start with a strict national division hierarchy. Ratings only order teams
- // within their own tier; they cannot push a Division II/III team over FBS/FCS.
- const ranked=[...sortedTeams].sort((a,b)=>
-  tierOrder(a.tier)-tierOrder(b.tier)||
-  b.powerRating-a.powerRating||
-  b.wins-a.wins||
-  b.avgMargin-a.avgMargin
- );
- // Narrow head-to-head exception: allow a lower-tier team to pass a higher-tier
- // opponent only when they are directly adjacent in the list and the lower-tier
- // team has a winning season series. This prevents one result from leapfrogging
- // unrelated teams in the higher divisions.
- for(let i=1;i<ranked.length;i++){
-  const team=ranked[i];
-  const teamTier=tierOrder(team.tier);
-  if(teamTier<=0||teamTier>=5)continue;
-  const opponent=ranked[i-1];
-  if(tierOrder(opponent.tier)>=teamTier)continue;
-  const meetings=team.gameLog.filter(g=>g.oppId===opponent.id);
-  const wins=meetings.filter(g=>g.won).length;
-  const losses=meetings.length-wins;
-  if(meetings.length&&wins>losses){
-   ranked[i-1]=team;
-   ranked[i]=opponent;
+
+function tierFor(classification, conference, name) {
+  const c = String(classification || '').toLowerCase().trim();
+
+  if (c === 'fbs' && /\bnotre dame\b/i.test(name || '')) {
+    return 'FBS Independent (Notre Dame)';
   }
- }
- return ranked;
-}
-function clamp(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function addTeam(map,id,name,classification,conference){
- if(id==null||!name)return;
- const key=String(id),tier=tierFor(classification,conference,name);
- if(!map.has(key))map.set(key,{id:key,name:cleanName(name),tier,conference:cleanName(conference||'Independent'),rating:baseRating(tier),wins:0,losses:0,games:0,pointsFor:0,pointsAgainst:0,opponents:[],gameLog:[],signatureWins:0,resumeScore:0,h2hPoints:0,formBonus:0,streak:0});
-}
-function daysBetween(a,b){return Math.max(0,(b-a)/86400000);}
-function recencyWeight(gameDate,latestDate){
- if(!gameDate||!latestDate)return 1;
- const age=daysBetween(gameDate,latestDate);
- // 60-day half-life; old games still count, but current form has greater influence.
- return clamp(Math.pow(0.5,age/60),0.48,1.35);
-}
-function pathExists(graph,start,target,seen=new Set()){
- if(start===target)return true;
- if(seen.has(start))return false;
- seen.add(start);
- for(const next of (graph.get(start)||[]))if(pathExists(graph,next,target,seen))return true;
- return false;
-}
-function calculateHeadToHead(teamsById){
- const eligible=[...teamsById.values()];
- const graph=new Map(eligible.map(t=>[t.id,new Set()]));
- const pairResults=new Map();
- for(const a of eligible){
-  for(const g of a.gameLog){
-   const b=teamsById.get(g.oppId);if(!b||a.id>=b.id)continue;
-   if(Math.abs(a.wins-b.wins)>1)continue;
-   const key=a.id+'|'+b.id;
-   const rows=a.gameLog.filter(x=>x.oppId===b.id);
-   const winsA=rows.filter(x=>x.won).length,winsB=rows.length-winsA;
-   let recentNet=0;
-   for(const x of rows)recentNet+=(x.won?1:-1)*x.recency;
-   pairResults.set(key,{a,b,winsA,winsB,recentNet});
-   if(winsA>winsB)graph.get(a.id).add(b.id);
-   else if(winsB>winsA)graph.get(b.id).add(a.id);
+
+  if (c === 'fbs') {
+    return POWER.has(conference) ? 'FBS Power Conference' : 'FBS Other';
   }
- }
- // A decisive result is circular if the losing team can reach the winner through
- // other decisive head-to-head results among teams within one win of each other.
- for(const p of pairResults.values()){
-  if(p.winsA===p.winsB)continue;
-  const winner=p.winsA>p.winsB?p.a:p.b;
-  const loser=p.winsA>p.winsB?p.b:p.a;
-  const circular=pathExists(graph,loser.id,winner.id);
-  if(!circular){winner.h2hPoints+=18;loser.h2hPoints-=18;}
-  else{
-   // Circular head-to-head results are only a small supporting tiebreaker.
-   const recentBonus=clamp(p.recentNet*4,-6,6);
-   p.a.h2hPoints+=recentBonus;
-   p.b.h2hPoints-=recentBonus;
-  }
- }
- // Split/tied direct series: use the most recent head-to-head results as a modest tiebreak.
- for(const p of pairResults.values())if(p.winsA===p.winsB&&p.recentNet!==0){
-  const bonus=clamp(p.recentNet*4,-6,6);
-  p.a.h2hPoints+=bonus;p.b.h2hPoints-=bonus;
- }
+
+  if (c === 'fcs') return 'FCS';
+  if (c === 'ii') return 'Division II';
+  if (c === 'iii') return 'Division III';
+  if (c === 'ii/iii') return 'Division II/III';
+
+  return 'Other';
 }
-async function load(){
- $('refresh').disabled=true;$('status').textContent='Connecting to CollegeFootballData…';
- $('rows').innerHTML='<tr><td colspan="10" class="note">Loading game results…</td></tr>';
- try{
-  const response=await fetch(API_URL+'?year='+SEASON,{headers:{'Accept':'application/json'}});
-  if(!response.ok){let detail='HTTP '+response.status;try{const err=await response.json();if(err.details)detail+=' — '+err.details;else if(err.error)detail+=' — '+err.error;}catch{}throw new Error(detail);}
-  const payload=await response.json();if(!Array.isArray(payload.games))throw new Error('The data service response did not contain a games array.');
-  const allGames=payload.games,teamMap=new Map();
-  for(const g of allGames){addTeam(teamMap,g.homeId,g.homeTeam,g.homeClassification,g.homeConference);addTeam(teamMap,g.awayId,g.awayTeam,g.awayClassification,g.awayConference);}
-  const completed=allGames.filter(g=>g.completed===true&&g.homePoints!=null&&g.awayPoints!=null)
-   .sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||'')));
-  const validDates=completed.map(g=>new Date(g.startDate)).filter(d=>!isNaN(d.getTime()));
-  const latestDate=validDates.length?new Date(Math.max(...validDates.map(d=>d.getTime()))):null;
-  // Two chronological Elo passes estimate opponent quality. Recent games have more weight.
-  for(let pass=0;pass<2;pass++){
-   if(pass===1)for(const t of teamMap.values())t.rating=baseRating(t.tier);
-   for(const g of completed){
-    const home=teamMap.get(String(g.homeId)),away=teamMap.get(String(g.awayId));
-    if(!home||!away||home.id===away.id)continue;
-    const hp=Number(g.homePoints),ap=Number(g.awayPoints);if(hp===ap)continue;
-    const date=new Date(g.startDate),rw=recencyWeight(isNaN(date.getTime())?null:date,latestDate);
-    const margin=Math.abs(hp-ap),homeWin=hp>ap,homeAdv=g.neutralSite?0:55;
-    const expectedHome=1/(1+Math.pow(10,(away.rating-(home.rating+homeAdv))/400));
-    const actualHome=homeWin?1:0;
-    const marginMultiplier=1+0.25*(1-Math.exp(-margin/22));
-    const change=42*rw*marginMultiplier*(actualHome-expectedHome);
-    home.rating+=change;away.rating-=change;
-   }
-  }
-  for(const t of teamMap.values()){
-   t.wins=0;t.losses=0;t.games=0;t.pointsFor=0;t.pointsAgainst=0;t.opponents=[];t.gameLog=[];t.signatureWins=0;t.resumeScore=0;t.h2hPoints=0;t.formBonus=0;t.streak=0;
-  }
-  // Build weighted résumé from every completed game.
-  for(const g of completed){
-   const home=teamMap.get(String(g.homeId)),away=teamMap.get(String(g.awayId));
-   if(!home||!away||home.id===away.id)continue;
-   const hp=Number(g.homePoints),ap=Number(g.awayPoints);if(hp===ap)continue;
-   const margin=Math.abs(hp-ap),neutral=!!g.neutralSite;
-   const date=new Date(g.startDate),rw=recencyWeight(isNaN(date.getTime())?null:date,latestDate);
-   home.games++;away.games++;home.pointsFor+=hp;home.pointsAgainst+=ap;away.pointsFor+=ap;away.pointsAgainst+=hp;
-   home.opponents.push(away.rating);away.opponents.push(home.rating);
-   if(hp>ap){
-    home.wins++;away.losses++;
-    // Wins matter, but one signature result cannot erase a weak overall résumé.
-    const quality=clamp((away.rating-1500)*0.12,-8,20);
-    const marginBonus=Math.min(3,margin/18);
-    const venueBonus=neutral?1.5:0;
-    home.resumeScore+=(15+quality+marginBonus+venueBonus)*rw;
-    // A loss is more damaging when the opponent is below average; large defeats
-    // and shutouts receive additional, capped penalties.
-    const weakLossPenalty=clamp((1500-home.rating)*0.10,0,10);
-    const blowoutPenalty=Math.min(8,Math.max(0,margin-10)/8);
-    const shutoutPenalty=ap===0?6:0;
-    away.resumeScore+=(-19+clamp((home.rating-1500)*0.08,-6,8)-weakLossPenalty-blowoutPenalty-shutoutPenalty-(neutral?0.5:0))*rw;
-    if(away.rating>=1580)home.signatureWins++;
-    home.gameLog.push({oppId:away.id,won:true,recency:rw,date,margin});
-    away.gameLog.push({oppId:home.id,won:false,recency:rw,date,margin});
-   }else{
-    away.wins++;home.losses++;
-    const quality=clamp((home.rating-1500)*0.12,-8,20);
-    const marginBonus=Math.min(3,margin/18);
-    const venueBonus=neutral?1.5:2.5;
-    away.resumeScore+=(15+quality+marginBonus+venueBonus)*rw;
-    const weakLossPenalty=clamp((1500-away.rating)*0.10,0,10);
-    const blowoutPenalty=Math.min(8,Math.max(0,margin-10)/8);
-    const shutoutPenalty=hp===0?6:0;
-    home.resumeScore+=(-19+clamp((away.rating-1500)*0.08,-6,8)-weakLossPenalty-blowoutPenalty-shutoutPenalty-(neutral?0.5:0))*rw;
-    if(home.rating>=1580)away.signatureWins++;
-    away.gameLog.push({oppId:home.id,won:true,recency:rw,date,margin});
-    home.gameLog.push({oppId:away.id,won:false,recency:rw,date,margin});
-   }
-  }
-  // Reward current streaks separately, capped so early-season losses still matter.
-  for(const t of teamMap.values()){
-   const recent=[...t.gameLog].sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0)).slice(0,6);
-   let streak=0;
-   for(const g of [...t.gameLog].sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0))){if(g.won)streak++;else break;}
-   t.streak=streak;
-   const recentNet=recent.reduce((s,g)=>s+(g.won?1:-1)*g.recency,0);
-   t.formBonus=recentNet*3.0+Math.min(14,streak*2.5);
-  }
-  calculateHeadToHead(teamMap);
-  const scoredTeams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0,powerRating:1500+t.resumeScore+t.formBonus+t.h2hPoints}))
-   .sort((a,b)=>b.powerRating-a.powerRating||b.h2hPoints-a.h2hPoints||b.formBonus-a.formBonus||b.avgMargin-a.avgMargin||b.wins-a.wins);
-  teams=applyDivisionHierarchy(scoredTeams);
-  $('teamCount').textContent=teams.length.toLocaleString();$('gameCount').textContent=completed.length.toLocaleString();$('updated').textContent=new Date().toLocaleTimeString();
-  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games. Head-to-head, recent form, résumé quality and dominance are included.';
-  render();
- }catch(err){$('status').textContent='Could not load CollegeFootballData: '+err.message+'. Check the Worker and try refreshing.';$('rows').innerHTML='<tr><td colspan="10" class="note">No data available. Try refreshing.</td></tr>';}finally{$('refresh').disabled=false;}
+
+function baseRating(tier) {
+  if (tier === 'FBS Power Conference' || tier === 'FBS Independent (Notre Dame)') return 1530;
+  if (tier === 'FBS Other') return 1515;
+  if (tier === 'FCS') return 1500;
+  return 1485;
 }
-function render(){
- const q=$('search').value.trim().toLowerCase(),d=$('division').value;
- const filtered=teams.filter(t=>(d==='All'||t.tier===d)&&t.name.toLowerCase().includes(q));
- $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.powerRating.toFixed(1)+'</td><td class="num">'+t.sos.toFixed(0)+'</td><td class="num">'+(t.avgMargin>=0?'+':'')+t.avgMargin.toFixed(1)+'</td><td class="num">'+(t.streak?('W'+t.streak):'—')+'</td><td class="num">'+t.h2hPoints.toFixed(0)+'</td></tr>').join('')||'<tr><td colspan="10" class="note">No matching teams.</td></tr>';
+
+function tierOrder(tier) {
+  if (tier === 'FBS Power Conference' || tier === 'FBS Independent (Notre Dame)') return 0;
+  if (tier === 'FBS Other') return 1;
+  if (tier === 'FCS') return 2;
+  if (tier === 'Division II' || tier === 'Division II/III') return 3;
+  if (tier === 'Division III') return 4;
+  return 5;
 }
-$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('division').addEventListener('change',render);load();
+
+function clamp(x,a,b) {
+  return Math.max(a,Math.min(b,x));
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g,c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+function addTeam(map,id,name,classification,conference) {
+  if (id == null || !name) return;
+
+  const key = String(id);
+  const tier = tierFor(classification,conference,name);
+
+  if (!map.has(key)) {
+    map.set(key,{
+      id:key,
+      name:cleanName(name),
+      tier,
+      conference:cleanName(conference || 'Independent'),
+      rating:baseRating(tier),
+      wins:0,
+      losses:0,
+      games:0,
+      pointsFor:0,
+      pointsAgainst:0,
+      opponents:[],
+      gameLog:[],
+      resumeScore:0,
+      h2hPoints:0,
+      formBonus:0,
+      streak:0
+    });
+  }
+}
+
+function recencyWeight(date,latest) {
+  if (!date || !latest) return 1;
+
+  const days = Math.max(0,(latest-date)/86400000);
+  return clamp(Math.pow(.5,days/60),.48,1.35);
+}
+
+function pathExists(graph,start,target,seen=new Set()) {
+  if (start === target) return true;
+  if (seen.has(start)) return false;
+
+  seen.add(start);
+
+  for (const next of graph.get(start) || []) {
+    if (pathExists(graph,next,target,seen)) return true;
+  }
+
+  return false;
+}
+
+/* Division order is strict except for direct winning head-to-head results. */
+function applyDivisionHierarchy(arr) {
+  const ranked = [...arr].sort((a,b) =>
+    tierOrder(a.tier)-tierOrder(b.tier) ||
+    b.powerRating-a.powerRating ||
+    b.wins-a.wins ||
+    b.avgMargin-a.avgMargin
+  );
+
+  for (let i=1; i<ranked.length; i++) {
+    const lower = ranked[i];
+    const lowerTier = tierOrder(lower.tier);
+
+    if (lowerTier <= 0 || lowerTier >= 5) continue;
+
+    const higher = ranked[i-1];
+
+    if (tierOrder(higher.tier) >= lowerTier) continue;
+
+    const games = lower.gameLog.filter(g => g.oppId === higher.id);
+    const wins = games.filter(g => g.won).length;
+
+    if (games.length && wins > games.length-wins) {
+      ranked[i-1] = lower;
+      ranked[i] = higher;
+    }
+  }
+
+  return ranked;
+}
+
+/* Head-to-head bonuses are based on venue-adjusted winning margins. */
+function calculateHeadToHead(map) {
+  const all = [...map.values()];
+  const graph = new Map(all.map(t => [t.id,new Set()]));
+  const pairs = new Map();
+
+  for (const a of all) {
+    for (const game of a.gameLog) {
+      const b = map.get(game.oppId);
+
+      if (!b || a.id >= b.id) continue;
+      if (Math.abs(a.wins-b.wins) > 1) continue;
+
+      const rows = a.gameLog.filter(g => g.oppId === b.id);
+      const winsA = rows.filter(g => g.won).length;
+      const winsB = rows.length-winsA;
+
+      let edge = 0;
+      let weight = 0;
+
+      for (const row of rows) {
+        edge += (row.neutralMargin || 0)*row.recency;
+        weight += row.recency;
+      }
+
+      pairs.set(a.id+'|'+b.id,{
+        a,b,winsA,winsB,edge,weight
+      });
+
+      if (winsA > winsB) graph.get(a.id).add(b.id);
+      else if (winsB > winsA) graph.get(b.id).add(a.id);
+    }
+  }
+
+  for (const pair of pairs.values()) {
+    if (pair.winsA === pair.winsB) continue;
+
+    const aWon = pair.winsA > pair.winsB;
+    const winner = aWon ? pair.a : pair.b;
+    const loser = aWon ? pair.b : pair.a;
+
+    // Orient the margin toward the actual series winner.
+    const winnerEdge = aWon ? pair.edge : -pair.edge;
+    const averageMargin = winnerEdge/(pair.weight || 1);
+
+    if (!pathExists(graph,loser.id,winner.id)) {
+      const bonus = clamp(12+averageMargin*.65,6,24);
+      winner.h2hPoints += bonus;
+      loser.h2hPoints -= bonus;
+    } else {
+      const bonus = clamp(winnerEdge*.25,-6,6);
+      winner.h2hPoints += bonus;
+      loser.h2hPoints -= bonus;
+    }
+  }
+
+  for (const pair of pairs.values()) {
+    if (pair.winsA === pair.winsB && pair.edge !== 0) {
+      const bonus = clamp(pair.edge*.25,-6,6);
+      pair.a.h2hPoints += bonus;
+      pair.b.h2hPoints -= bonus;
+    }
+  }
+}
+
+async function load() {
+  $('refresh').disabled = true;
+  $('status').textContent = 'Connecting to CollegeFootballData…';
+  $('rows').innerHTML =
+    '<tr><td colspan="10" class="note">Loading game results…</td></tr>';
+
+  try {
+    const response = await fetch(API_URL+'?year='+SEASON,{
+      headers:{Accept:'application/json'}
+    });
+
+    if (!response.ok) {
+      let message = 'HTTP '+response.status;
+      try {
+        const error = await response.json();
+        message += ' — '+(error.details || error.error || '');
+      } catch {}
+      throw Error(message);
+    }
+
+    const payload = await response.json();
+
+    if (!Array.isArray(payload.games)) {
+      throw Error('The data service response did not contain a games array.');
+    }
+
+    const allGames = payload.games;
+    const map = new Map();
+
+    for (const game of allGames) {
+      addTeam(map,game.homeId,game.homeTeam,game.homeClassification,game.homeConference);
+      addTeam(map,game.awayId,game.awayTeam,game.awayClassification,game.awayConference);
+    }
+
+    const completed = allGames
+      .filter(g =>
+        g.completed === true &&
+        g.homePoints != null &&
+        g.awayPoints != null
+      )
+      .sort((a,b) =>
+        String(a.startDate || '').localeCompare(String(b.startDate || ''))
+      );
+
+    const dates = completed
+      .map(g => new Date(g.startDate))
+      .filter(d => !isNaN(d));
+
+    const latest = dates.length
+      ? new Date(Math.max(...dates.map(d => d.getTime())))
+      : null;
+
+    /*
+      Elo:
+      Home-field advantage is 55 rating points.
+      Multiple passes allow opponent ratings to respond to the schedule.
+    */
+    for (let pass=0; pass<2; pass++) {
+      if (pass === 0) {
+        for (const team of map.values()) {
+          team.rating = baseRating(team.tier);
+        }
+      }
+
+      for (const game of completed) {
+        const home = map.get(String(game.homeId));
+        const away = map.get(String(game.awayId));
+
+        if (!home || !away || home.id === away.id) continue;
+
+        const hp = Number(game.homePoints);
+        const ap = Number(game.awayPoints);
+
+        if (hp === ap) continue;
+
+        const date = new Date(game.startDate);
+        const rw = recencyWeight(isNaN(date) ? null : date,latest);
+        const margin = Math.abs(hp-ap);
+        const homeAdvantage = game.neutralSite ? 0 : 55;
+
+        const expectedHome =
+          1/(1+Math.pow(10,(away.rating-(home.rating+homeAdvantage))/400));
+
+        const actualHome = hp > ap ? 1 : 0;
+        const marginMultiplier =
+          1+.25*(1-Math.exp(-margin/22));
+
+        const change =
+          42*rw*marginMultiplier*(actualHome-expectedHome);
+
+        home.rating += change;
+        away.rating -= change;
+      }
+    }
+
+    for (const team of map.values()) {
+      Object.assign(team,{
+        wins:0,
+        losses:0,
+        games:0,
+        pointsFor:0,
+        pointsAgainst:0,
+        opponents:[],
+        gameLog:[],
+        resumeScore:0,
+        h2hPoints:0,
+        formBonus:0,
+        streak:0
+      });
+    }
+
+    /*
+      Résumé scoring:
+      Road wins get +3 relative to home wins.
+      Home losses get an additional -3 penalty.
+      Road losses get +3 points of relief.
+      Neutral-site games receive no venue adjustment.
+    */
+    for (const game of completed) {
+      const home = map.get(String(game.homeId));
+      const away = map.get(String(game.awayId));
+
+      if (!home || !away || home.id === away.id) continue;
+
+      const hp = Number(game.homePoints);
+      const ap = Number(game.awayPoints);
+
+      if (hp === ap) continue;
+
+      const margin = Math.abs(hp-ap);
+      const neutral = !!game.neutralSite;
+      const date = new Date(game.startDate);
+      const rw = recencyWeight(isNaN(date) ? null : date,latest);
+
+      home.games++;
+      away.games++;
+
+      home.pointsFor += hp;
+      home.pointsAgainst += ap;
+      away.pointsFor += ap;
+      away.pointsAgainst += hp;
+
+      home.opponents.push(away.rating);
+      away.opponents.push(home.rating);
+
+      // Winner's neutral-site margin: road wins are adjusted upward.
+      const neutralMargin = margin+(neutral ? 0 : -3);
+
+      if (hp > ap) {
+        home.wins++;
+        away.losses++;
+
+        const quality = clamp((away.rating-1500)*.12,-8,20);
+        const marginBonus = Math.min(3,margin/18);
+
+        home.resumeScore +=
+          (15+quality+marginBonus+(neutral ? 1.5 : 0))*rw;
+
+        const weak = clamp((1500-home.rating)*.10,0,10);
+        const blowout = Math.min(8,Math.max(0,margin-10)/8);
+        const shutout = ap === 0 ? 6 : 0;
+
+        away.resumeScore +=
+          (-19+
+           clamp((home.rating-1500)*.08,-6,8)-
+           weak-
+           blowout-
+           shutout-
+           (neutral ? .5 : 0)+
+           (neutral ? 0 : 3))*rw;
+
+        home.gameLog.push({
+          oppId:away.id,
+          won:true,
+          recency:rw,
+          date,
+          margin,
+          neutralMargin
+        });
+
+        away.gameLog.push({
+          oppId:home.id,
+          won:false,
+          recency:rw,
+          date,
+          margin,
+          neutralMargin:-neutralMargin
+        });
+
+      } else {
+        away.wins++;
+        home.losses++;
+
+        const quality = clamp((home.rating-1500)*.12,-8,20);
+        const marginBonus = Math.min(3,margin/18);
+
+        // Away team won on the road.
+        away.resumeScore +=
+          (15+quality+marginBonus+(neutral ? 1.5 : 3))*rw;
+
+        const weak = clamp((1500-away.rating)*.10,0,10);
+        const blowout = Math.min(8,Math.max(0,margin-10)/8);
+        const shutout = hp === 0 ? 6 : 0;
+
+        home.resumeScore +=
+          (-19+
+           clamp((away.rating-1500)*.08,-6,8)-
+           weak-
+           blowout-
+           shutout-
+           (neutral ? .5 : 0)-
+           (neutral ? 0 : 3))*rw;
+
+        away.gameLog.push({
+          oppId:home.id,
+          won:true,
+          recency:rw,
+          date,
+          margin,
+          neutralMargin
+        });
+
+        home.gameLog.push({
+          oppId:away.id,
+          won:false,
+          recency:rw,
+          date,
+          margin,
+          neutralMargin:-neutralMargin
+        });
+      }
+    }
+
+    // Recent form and winning streaks.
+    for (const team of map.values()) {
+      const ordered = [...team.gameLog].sort((a,b) =>
+        (b.date?.getTime() || 0)-(a.date?.getTime() || 0)
+      );
+
+      const recent = ordered.slice(0,6);
+
+      let streak = 0;
+
+      for (const game of ordered) {
+        if (game.won) streak++;
+        else break;
+      }
+
+      team.streak = streak;
+
+      const recentNet = recent.reduce(
+        (sum,game) => sum+(game.won ? 1 : -1)*game.recency,
+        0
+      );
+
+      team.formBonus =
+        recentNet*3+Math.min(14,streak*2.5);
+    }
+
+    calculateHeadToHead(map);
+
+    const scored = [...map.values()].map(team => ({
+      ...team,
+      sos:team.opponents.length
+        ? team.opponents.reduce((a,b)=>a+b,0)/team.opponents.length
+        : 1500,
+      avgMargin:team.games
+        ? (team.pointsFor-team.pointsAgainst)/team.games
+        : 0,
+      powerRating:
+        1500+
+        team.resumeScore+
+        team.formBonus+
+        team.h2hPoints
+    })).sort((a,b) =>
+      b.powerRating-a.powerRating ||
+      b.h2hPoints-a.h2hPoints ||
+      b.formBonus-a.formBonus ||
+      b.avgMargin-a.avgMargin ||
+      b.wins-a.wins
+    );
+
+    teams = applyDivisionHierarchy(scored);
+
+    $('teamCount').textContent = teams.length.toLocaleString();
+    $('gameCount').textContent = completed.length.toLocaleString();
+    $('updated').textContent = new Date().toLocaleTimeString();
+
+    $('status').textContent =
+      'Loaded '+teams.length+' teams from '+completed.length+
+      ' completed games. Venue-adjusted résumé, head-to-head and recent form included.';
+
+    render();
+
+  } catch (error) {
+    $('status').textContent =
+      'Could not load CollegeFootballData: '+error.message+
+      '. Check the Worker and try refreshing.';
+
+    $('rows').innerHTML =
+      '<tr><td colspan="10" class="note">No data available. Try refreshing.</td></tr>';
+
+  } finally {
+    $('refresh').disabled = false;
+  }
+}
+
+function render() {
+  const query = $('search').value.trim().toLowerCase();
+  const division = $('division').value;
+
+  const filtered = teams.filter(team =>
+    (division === 'All' || team.tier === division) &&
+    team.name.toLowerCase().includes(query)
+  );
+
+  $('rows').innerHTML = filtered.map((team,index) =>
+    '<tr>'+
+      '<td class="rank">'+(index+1)+'</td>'+
+      '<td class="team">'+escapeHtml(team.name)+'</td>'+
+      '<td class="tier">'+escapeHtml(team.tier)+'</td>'+
+      '<td class="tier">'+escapeHtml(team.conference || '—')+'</td>'+
+      '<td class="num">'+team.wins+'-'+team.losses+'</td>'+
+      '<td class="num">'+team.powerRating.toFixed(1)+'</td>'+
+      '<td class="num">'+team.sos.toFixed(0)+'</td>'+
+      '<td class="num">'+
+        (team.avgMargin >= 0 ? '+' : '')+
+        team.avgMargin.toFixed(1)+
+      '</td>'+
+      '<td class="num">'+(team.streak ? 'W'+team.streak : '—')+'</td>'+
+      '<td class="num">'+team.h2hPoints.toFixed(0)+'</td>'+
+    '</tr>'
+  ).join('') ||
+  '<tr><td colspan="10" class="note">No matching teams.</td></tr>';
+}
+
+$('refresh').addEventListener('click',load);
+$('search').addEventListener('input',render);
+$('division').addEventListener('change',render);
+
+load();
 </script>
-</body></html>
+</body>
+</html>
