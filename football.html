@@ -42,9 +42,9 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 <h2>How this version ranks teams</h2>
 <p><b>Division hierarchy:</b> Power-conference FBS teams (and Notre Dame) rank ahead of other FBS, followed by FCS, Division II and Division III. A lower-division team can jump a higher-division opponent only if it has a winning head-to-head record against that specific team. Without a direct result, the division hierarchy holds.</p>
 <p><b>Notre Dame:</b> Notre Dame receives the same top-tier treatment as a Power Conference FBS team. Its ranking is then determined by its actual schedule and results, not a conference label.</p>
-<p><b>Head-to-head:</b> When two teams have records within one win, a decisive head-to-head result is the first major tiebreaker. If the relevant results form a circular chain, the model reduces the direct head-to-head bonus and uses the recency of those games instead.</p>
-<p><b>Recent form:</b> Recent games count more than early-season games. A current winning streak receives an additional form bonus, allowing a hot 6–4 team to make a meaningful move without erasing its earlier losses.</p>
-<p><b>Résumé and consistency:</b> Quality wins earn more credit, losses to weak opponents cost more, and every game still contributes. Margin of victory is capped and used as a final dominance tiebreaker rather than allowing blowouts to overwhelm the résumé.</p>
+<p><b>Head-to-head:</b> Direct results are a modest tiebreaker, not a season-saving bonus. A win over a comparable team helps, but it cannot erase multiple poor losses.</p>
+<p><b>Recent form:</b> Recent games count more than early-season games. Winning streaks help, but the bonus is capped and cannot erase the full-season record.</p>
+<p><b>Résumé and consistency:</b> Every game matters. Quality wins help, but losses to below-average opponents are penalized more heavily; blowout losses and shutouts carry additional penalties. Margin bonuses for wins are deliberately small, so one big win cannot outweigh a string of poor performances.</p>
 <p>Opponent quality is estimated from an iterative schedule rating. Cross-division comparisons remain less certain when teams have few or no common opponents. This is an independent model, not an official poll.</p>
 </section>
 <div class="footer">Data source: CollegeFootballData API, accessed through a private Cloudflare Worker. This page is an independent, non-commercial project.</div>
@@ -160,17 +160,17 @@ function calculateHeadToHead(teamsById){
   const winner=p.winsA>p.winsB?p.a:p.b;
   const loser=p.winsA>p.winsB?p.b:p.a;
   const circular=pathExists(graph,loser.id,winner.id);
-  if(!circular){winner.h2hPoints+=110;loser.h2hPoints-=110;}
+  if(!circular){winner.h2hPoints+=18;loser.h2hPoints-=18;}
   else{
-   // In a circular mini-table, orient the smaller bonus to the most recent direct results.
-   const recentBonus=clamp(p.recentNet*12,-18,18);
+   // Circular head-to-head results are only a small supporting tiebreaker.
+   const recentBonus=clamp(p.recentNet*4,-6,6);
    p.a.h2hPoints+=recentBonus;
    p.b.h2hPoints-=recentBonus;
   }
  }
  // Split/tied direct series: use the most recent head-to-head results as a modest tiebreak.
  for(const p of pairResults.values())if(p.winsA===p.winsB&&p.recentNet!==0){
-  const bonus=clamp(p.recentNet*12,-18,18);
+  const bonus=clamp(p.recentNet*4,-6,6);
   p.a.h2hPoints+=bonus;p.b.h2hPoints-=bonus;
  }
 }
@@ -217,21 +217,30 @@ async function load(){
    home.opponents.push(away.rating);away.opponents.push(home.rating);
    if(hp>ap){
     home.wins++;away.losses++;
-    const quality=clamp((away.rating-1500)*0.16,-12,32);
-    const marginBonus=Math.min(5,margin/14);
-    const venueBonus=neutral?2:0;
-    home.resumeScore+=(22+quality+marginBonus+venueBonus)*rw;
-    away.resumeScore+=(-22+clamp((home.rating-1500)*0.12,-18,15)-Math.min(4,margin/18)-(neutral?1:3))*rw;
+    // Wins matter, but one signature result cannot erase a weak overall résumé.
+    const quality=clamp((away.rating-1500)*0.12,-8,20);
+    const marginBonus=Math.min(3,margin/18);
+    const venueBonus=neutral?1.5:0;
+    home.resumeScore+=(15+quality+marginBonus+venueBonus)*rw;
+    // A loss is more damaging when the opponent is below average; large defeats
+    // and shutouts receive additional, capped penalties.
+    const weakLossPenalty=clamp((1500-home.rating)*0.10,0,10);
+    const blowoutPenalty=Math.min(8,Math.max(0,margin-10)/8);
+    const shutoutPenalty=ap===0?6:0;
+    away.resumeScore+=(-19+clamp((home.rating-1500)*0.08,-6,8)-weakLossPenalty-blowoutPenalty-shutoutPenalty-(neutral?0.5:0))*rw;
     if(away.rating>=1580)home.signatureWins++;
     home.gameLog.push({oppId:away.id,won:true,recency:rw,date,margin});
     away.gameLog.push({oppId:home.id,won:false,recency:rw,date,margin});
    }else{
     away.wins++;home.losses++;
-    const quality=clamp((home.rating-1500)*0.16,-12,32);
-    const marginBonus=Math.min(5,margin/14);
-    const venueBonus=neutral?2:5;
-    away.resumeScore+=(22+quality+marginBonus+venueBonus)*rw;
-    home.resumeScore+=(-22+clamp((away.rating-1500)*0.12,-18,15)-Math.min(4,margin/18)-(neutral?1:3))*rw;
+    const quality=clamp((home.rating-1500)*0.12,-8,20);
+    const marginBonus=Math.min(3,margin/18);
+    const venueBonus=neutral?1.5:2.5;
+    away.resumeScore+=(15+quality+marginBonus+venueBonus)*rw;
+    const weakLossPenalty=clamp((1500-away.rating)*0.10,0,10);
+    const blowoutPenalty=Math.min(8,Math.max(0,margin-10)/8);
+    const shutoutPenalty=hp===0?6:0;
+    home.resumeScore+=(-19+clamp((away.rating-1500)*0.08,-6,8)-weakLossPenalty-blowoutPenalty-shutoutPenalty-(neutral?0.5:0))*rw;
     if(home.rating>=1580)away.signatureWins++;
     away.gameLog.push({oppId:home.id,won:true,recency:rw,date,margin});
     home.gameLog.push({oppId:away.id,won:false,recency:rw,date,margin});
@@ -244,7 +253,7 @@ async function load(){
    for(const g of [...t.gameLog].sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0))){if(g.won)streak++;else break;}
    t.streak=streak;
    const recentNet=recent.reduce((s,g)=>s+(g.won?1:-1)*g.recency,0);
-   t.formBonus=recentNet*3.5+Math.min(28,streak*4.5);
+   t.formBonus=recentNet*3.0+Math.min(14,streak*2.5);
   }
   calculateHeadToHead(teamMap);
   const scoredTeams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0,powerRating:1500+t.resumeScore+t.formBonus+t.h2hPoints}))
