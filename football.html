@@ -86,28 +86,31 @@ function tierOrder(tier){
  return 5;
 }
 function applyDivisionHierarchy(sortedTeams){
- const ranked=[...sortedTeams].sort((a,b)=>tierOrder(a.tier)-tierOrder(b.tier)||b.powerRating-a.powerRating);
- // Process lower tiers from strongest to weakest. A team is promoted just above
- // the highest-ranked higher-tier opponent it has a winning head-to-head record against.
- for(const team of [...ranked].sort((a,b)=>tierOrder(a.tier)-tierOrder(b.tier)||b.powerRating-a.powerRating)){
+ // Start with a strict national division hierarchy. Ratings only order teams
+ // within their own tier; they cannot push a Division II/III team over FBS/FCS.
+ const ranked=[...sortedTeams].sort((a,b)=>
+  tierOrder(a.tier)-tierOrder(b.tier)||
+  b.powerRating-a.powerRating||
+  b.wins-a.wins||
+  b.avgMargin-a.avgMargin
+ );
+ // Narrow head-to-head exception: allow a lower-tier team to pass a higher-tier
+ // opponent only when they are directly adjacent in the list and the lower-tier
+ // team has a winning season series. This prevents one result from leapfrogging
+ // unrelated teams in the higher divisions.
+ for(let i=1;i<ranked.length;i++){
+  const team=ranked[i];
   const teamTier=tierOrder(team.tier);
-  if(teamTier===0||teamTier>=5)continue;
-  const opponentsWonAgainst=new Set();
-  for(const game of team.gameLog){
-   if(!game.won)continue;
-   const opponent=ranked.find(x=>x.id===game.oppId);
-   if(!opponent||tierOrder(opponent.tier)>=teamTier)continue;
-   const h2h=team.gameLog.filter(x=>x.oppId===opponent.id);
-   const wins=h2h.filter(x=>x.won).length;
-   const losses=h2h.length-wins;
-   if(wins>losses)opponentsWonAgainst.add(opponent.id);
+  if(teamTier<=0||teamTier>=5)continue;
+  const opponent=ranked[i-1];
+  if(tierOrder(opponent.tier)>=teamTier)continue;
+  const meetings=team.gameLog.filter(g=>g.oppId===opponent.id);
+  const wins=meetings.filter(g=>g.won).length;
+  const losses=meetings.length-wins;
+  if(meetings.length&&wins>losses){
+   ranked[i-1]=team;
+   ranked[i]=opponent;
   }
-  if(!opponentsWonAgainst.size)continue;
-  const opponentIndexes=ranked.map((x,i)=>opponentsWonAgainst.has(x.id)?i:-1).filter(i=>i>=0);
-  if(!opponentIndexes.length)continue;
-  const target=Math.min(...opponentIndexes);
-  const current=ranked.findIndex(x=>x.id===team.id);
-  if(current>target){ranked.splice(current,1);ranked.splice(target,0,team);}
  }
  return ranked;
 }
