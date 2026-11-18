@@ -19,7 +19,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 <body><main>
 <div class="eyebrow">Independent model · 2026 season</div>
 <h1>College Football<br>National Power Rankings</h1>
-<p class="sub">A résumé-first ranking of teams across FBS, FCS, Division II and Division III. Signature wins carry extra weight, but every game matters: consistency, opponent quality, game location and winning margin all shape the rating.</p>
+<p class="sub">A résumé-first ranking of teams across FBS, FCS, Division II and Division III. Quality wins now directly drive the ranking: beating elite opponents earns a major premium, while bad losses are penalized. Consistency still matters because every result counts.</p>
 <section class="panel">
 <div class="controls">
 <input id="search" type="search" placeholder="Search for a team…" aria-label="Search teams">
@@ -40,10 +40,10 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 </section>
 <section class="panel note">
 <h2>How the résumé model works</h2>
-<p><b>1. Quality wins are the biggest differentiator.</b> Beating a highly rated opponent earns more than beating a struggling one. Upset wins are especially valuable, and signature wins are counted separately.</p>
-<p><b>2. Consistency still matters.</b> Every win and loss changes the rating. A team with a strong overall record will generally rank well, but a weak loss can outweigh an ordinary win.</p>
-<p><b>3. Margin is a supporting factor.</b> Larger wins help, but the margin adjustment is capped so running up the score cannot overwhelm the résumé.</p>
-<p><b>4. Location matters.</b> Road wins receive more credit than equivalent home wins; neutral-site games receive no home-field adjustment.</p>
+<p><b>1. Quality wins directly drive the ranking.</b> Every win starts at +22 résumé points, then earns up to 32 additional points for beating a highly rated opponent. Signature wins are also counted.</p>
+<p><b>2. Consistency still matters.</b> Every win earns a base reward and every loss carries a base penalty. A loss to a strong team is less damaging than a loss to a weak team; a bad loss can erase the value of several ordinary wins.</p>
+<p><b>3. Margin is a supporting factor.</b> Winning margin adds at most five points to a win or a small additional penalty to a loss, so running up the score cannot overwhelm the résumé.</p>
+<p><b>4. Opponent quality is estimated with an Elo schedule model.</b> The final table is sorted by résumé score, not by the intermediate Elo rating. Starting division offsets are small and are used only to help estimate opponent strength.</p>
 <p>Ratings begin close together across divisions so division labels do not predetermine the rankings. Cross-division comparisons remain less certain when teams have few or no common opponents. This is an independent model, not an official poll.</p>
 </section>
 <div class="footer">Data source: CollegeFootballData API, accessed through a private Cloudflare Worker. This page is an independent, non-commercial project.</div>
@@ -76,7 +76,7 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 function addTeam(map,id,name,classification,conference){
  if(id==null||!name)return;
  const key=String(id),tier=tierFor(classification,conference);
- if(!map.has(key))map.set(key,{id:key,name:cleanName(name),tier,conference:cleanName(conference||''),rating:baseRating(tier),wins:0,losses:0,games:0,pointsFor:0,pointsAgainst:0,opponents:[],signatureWins:0});
+ if(!map.has(key))map.set(key,{id:key,name:cleanName(name),tier,conference:cleanName(conference||''),rating:baseRating(tier),wins:0,losses:0,games:0,pointsFor:0,pointsAgainst:0,opponents:[],signatureWins:0,resumeScore:0});
 }
 function clamp(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
 async function load(){
@@ -108,28 +108,47 @@ async function load(){
     home.rating+=change;away.rating-=change;
    }
   }
-  // Final résumé statistics use the finished opponent ratings, not the teams' starting tiers.
-  for(const t of teamMap.values()){t.wins=0;t.losses=0;t.games=0;t.pointsFor=0;t.pointsAgainst=0;t.opponents=[];t.signatureWins=0;}
+  // Build a true résumé score. Elo is used to estimate opponent quality, but the
+  // final ranking is driven by the value of each win/loss, not raw Elo alone.
+  for(const t of teamMap.values()){t.wins=0;t.losses=0;t.games=0;t.pointsFor=0;t.pointsAgainst=0;t.opponents=[];t.signatureWins=0;t.resumeScore=0;}
   for(const g of completed){
    const home=teamMap.get(String(g.homeId)),away=teamMap.get(String(g.awayId));
    if(!home||!away||home.id===away.id)continue;
    const hp=Number(g.homePoints),ap=Number(g.awayPoints);if(hp===ap)continue;
+   const margin=Math.abs(hp-ap),neutral=!!g.neutralSite;
    home.games++;away.games++;home.pointsFor+=hp;home.pointsAgainst+=ap;away.pointsFor+=ap;away.pointsAgainst+=hp;
    home.opponents.push(away.rating);away.opponents.push(home.rating);
-   if(hp>ap){home.wins++;away.losses++;if(away.rating>=1580)home.signatureWins++;}
-   else{away.wins++;home.losses++;if(home.rating>=1580)away.signatureWins++;}
+   // Strong-opponent wins earn a large premium. Losses to strong teams hurt less;
+   // losses to weak teams hurt substantially. Margin is deliberately a small add-on.
+   if(hp>ap){
+    home.wins++;away.losses++;
+    const quality=clamp((away.rating-1500)*0.16,-12,32);
+    const marginBonus=Math.min(5,margin/14);
+    const venueBonus=neutral?2:0;
+    home.resumeScore+=22+quality+marginBonus+venueBonus;
+    away.resumeScore+=-22+clamp((home.rating-1500)*0.12,-18,15)-Math.min(4,margin/18)-(neutral?1:0);
+    if(away.rating>=1580)home.signatureWins++;
+   }else{
+    away.wins++;home.losses++;
+    const quality=clamp((home.rating-1500)*0.16,-12,32);
+    const marginBonus=Math.min(5,margin/14);
+    const venueBonus=neutral?2:5; // away wins earn a premium; neutral wins get a smaller premium
+    away.resumeScore+=22+quality+marginBonus+venueBonus;
+    home.resumeScore+=-22+clamp((away.rating-1500)*0.12,-18,15)-Math.min(4,margin/18)-(neutral?1:3);
+    if(home.rating>=1580)away.signatureWins++;
+   }
   }
-  teams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0}))
-   .sort((a,b)=>b.rating-a.rating);
+  teams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0,powerRating:1500+t.resumeScore}))
+   .sort((a,b)=>b.powerRating-a.powerRating);
   $('teamCount').textContent=teams.length.toLocaleString();$('gameCount').textContent=completed.length.toLocaleString();$('updated').textContent=new Date().toLocaleTimeString();
-  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games for '+SEASON+'. Ratings reward quality wins, consistency, location and capped margin.';
+  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games for '+SEASON+'. Rankings are now sorted by résumé score: quality wins, bad losses, consistency and capped margin.';
   render();
  }catch(err){$('status').textContent='Could not load CollegeFootballData: '+err.message+'. Check the Worker and try refreshing.';$('rows').innerHTML='<tr><td colspan="9" class="note">No data available. Try refreshing.</td></tr>';}finally{$('refresh').disabled=false;}
 }
 function render(){
  const q=$('search').value.trim().toLowerCase(),d=$('division').value;
  const filtered=teams.filter(t=>(d==='All'||t.tier===d)&&t.name.toLowerCase().includes(q));
- $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.rating.toFixed(1)+'</td><td class="num">'+t.sos.toFixed(0)+'</td><td class="num">'+(t.avgMargin>=0?'+':'')+t.avgMargin.toFixed(1)+'</td><td class="num">'+t.signatureWins+'</td></tr>').join('')||'<tr><td colspan="9" class="note">No matching teams.</td></tr>';
+ $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.powerRating.toFixed(1)+'</td><td class="num">'+t.sos.toFixed(0)+'</td><td class="num">'+(t.avgMargin>=0?'+':'')+t.avgMargin.toFixed(1)+'</td><td class="num">'+t.signatureWins+'</td></tr>').join('')||'<tr><td colspan="9" class="note">No matching teams.</td></tr>';
 }
 $('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('division').addEventListener('change',render);load();
 </script>
