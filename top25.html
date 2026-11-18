@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>College Football Top 25</title>
+<style>
+:root{color-scheme:dark;--gold:#f5c85b;--text:#f4f7fb;--muted:#aab8ca;--line:#293a53}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1c3554,#0b1423 55%,#080e19);color:var(--text);font:16px/1.45 system-ui,sans-serif}
+main{max-width:850px;margin:auto;padding:38px 18px}
+header{text-align:center;padding-bottom:25px}
+.kicker{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.2em}
+h1{font-size:clamp(38px,7vw,62px);line-height:1.05;margin:12px 0}
+.subtitle{color:var(--muted);max-width:620px;margin:auto;font-size:14px}
+.pills{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:20px}
+.pill{background:#142238;border:1px solid var(--line);border-radius:30px;padding:7px 13px;color:var(--muted);font-size:11px}
+.panel{background:#111c2d;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 18px 50px #0005}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:14px;background:#1a2a40;color:#b8c7d9;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+td{padding:12px 14px;border-top:1px solid #26364d}
+tbody tr:nth-child(-n+3){background:#26344a55}
+.rank{color:var(--gold);font-size:19px;font-weight:850;width:65px}
+.team{font-weight:750}
+.record,.rating{font-variant-numeric:tabular-nums}
+.rating{text-align:right;font-weight:750;color:#d9eaff}
+th:last-child{text-align:right}
+.actions{text-align:center;padding:25px 0 8px}
+a.button{display:inline-block;background:var(--gold);color:#17202c;text-decoration:none;font-weight:850;border-radius:10px;padding:13px 20px}
+a.button:hover{filter:brightness(1.1)}
+.note{text-align:center;color:var(--muted);font-size:12px;margin-top:13px}
+#status{text-align:center;color:var(--muted);font-size:12px;margin-top:15px}
+footer{text-align:center;color:#8292a8;font-size:11px;margin-top:25px}
+#source{position:absolute;left:-10000px;top:0;width:1200px;height:1000px;border:0}
+@media(max-width:520px){main{padding:25px 10px}td,th{padding:10px 8px}.rank{width:48px}.team{font-size:14px}}
+@media print{body{background:white;color:#111}main{padding:0}.panel{background:white;box-shadow:none;border:1px solid #bbb}th{background:#eee;color:#222}td{border-color:#ddd}.rank{color:#806000}.rating{color:#222}.actions,#status,footer,.pills{display:none}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div class="kicker">INDEPENDENT MODEL · 2026 SEASON</div>
+ <h1>College Football<br>Top 25</h1>
+ <p class="subtitle">
+  An independent national power ranking based on game results,
+  opponent strength, résumé quality, head-to-head and recent form.
+ </p>
+ <div class="pills">
+  <span class="pill">TOP 25 TEAMS</span>
+  <span class="pill">POWER RATINGS</span>
+  <span class="pill">NOT AN OFFICIAL POLL</span>
+ </div>
+</header>
+
+<section class="panel">
+<table>
+<thead>
+<tr><th>Rank</th><th>Team</th><th>Record</th><th>Power</th></tr>
+</thead>
+<tbody id="rows">
+<tr><td colspan="4">Loading the latest rankings…</td></tr>
+</tbody>
+</table>
+</section>
+
+<div class="actions">
+ <a class="button" href="football.html">VIEW FULL NATIONAL RANKINGS →</a>
+ <div class="note">The complete rankings include every team and additional model statistics.</div>
+</div>
+
+<div id="status">Connecting to rankings…</div>
+<footer>Independent College Football Power Rankings · 2026</footer>
+</main>
+
+<iframe id="source" src="football.html" title="Ranking data source"></iframe>
+
+<script>
+const rows=document.getElementById('rows');
+const status=document.getElementById('status');
+const frame=document.getElementById('source');
+
+let attempts=0;
+
+function loadTop25(){
+ attempts++;
+
+ try{
+  const doc=frame.contentDocument;
+  const sourceRows=[...doc.querySelectorAll('#rows tr')];
+
+  const valid=sourceRows.filter(row=>
+   row.querySelectorAll('td').length>=10
+  );
+
+  if(valid.length===0){
+   if(attempts<60){
+    setTimeout(loadTop25,1000);
+   }else{
+    status.textContent='Could not load rankings. Please try refreshing.';
+   }
+   return;
+  }
+
+  const top=valid.slice(0,25);
+
+  rows.innerHTML=top.map((row,index)=>{
+   const cells=row.querySelectorAll('td');
+   const team=cells[1].textContent;
+   const record=cells[4].textContent;
+   const power=cells[5].textContent;
+
+   return `
+    <tr>
+     <td class="rank">${index+1}</td>
+     <td class="team">${escapeHTML(team)}</td>
+     <td class="record">${escapeHTML(record)}</td>
+     <td class="rating">${escapeHTML(power)}</td>
+    </tr>`;
+  }).join('');
+
+  status.textContent='Updated from the full rankings page.';
+ }catch(error){
+  status.textContent='Unable to read the full rankings. Check that both pages are on the same website.';
+ }
+}
+
+function escapeHTML(value){
+ return String(value).replace(/[&<>"']/g,char=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;',
+  '"':'&quot;',"'":'&#39;'
+ }[char]));
+}
+
+frame.addEventListener('load',()=>{
+ attempts=0;
+ loadTop25();
+});
+</script>
+</body>
+</html>
