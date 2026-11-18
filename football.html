@@ -6,12 +6,12 @@
 <style>
 :root{color-scheme:dark;--panel:#121d30;--line:#263650;--muted:#9fb0c8;--text:#edf3fb;--accent:#62b5ff}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1220,#101c30);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:1120px;margin:0 auto;padding:42px 22px 64px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
-h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(--muted);max-width:760px;margin:0 0 26px}
+main{max-width:1180px;margin:0 auto;padding:42px 22px 64px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(--muted);max-width:820px;margin:0 0 26px}
 .panel{background:rgba(18,29,48,.92);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
 .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input,select,button{background:#0b1526;color:var(--text);border:1px solid #354964;border-radius:9px;padding:11px 13px;font:inherit}input{flex:1;min-width:210px}button{background:#1769aa;border-color:#277fca;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
 #status{color:var(--muted);font-size:13px;margin-top:13px}.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{background:#0b1526;border:1px solid var(--line);border-radius:11px;padding:12px 16px;min-width:140px}.stat strong{display:block;font-size:23px}.stat span{color:var(--muted);font-size:12px}
-.table-wrap{overflow:auto;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:700px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);position:sticky;top:0;background:#121d30}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.rank{color:var(--accent);font-weight:800}.team{font-weight:650}.tier{color:var(--muted);font-size:13px}
+.table-wrap{overflow:auto;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:880px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);position:sticky;top:0;background:#121d30}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.rank{color:var(--accent);font-weight:800}.team{font-weight:650}.tier{color:var(--muted);font-size:13px}
 .note{color:var(--muted);font-size:13px}.note h2{font-size:17px;color:var(--text);margin:0 0 7px}.note p{margin:6px 0}.footer{color:var(--muted);font-size:12px;margin-top:24px}
 @media(max-width:600px){main{padding:28px 14px}.panel{padding:14px}}
 </style>
@@ -19,7 +19,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 <body><main>
 <div class="eyebrow">Independent model · 2026 season</div>
 <h1>College Football<br>National Power Rankings</h1>
-<p class="sub">A results-based attempt to compare programs across FBS, FCS, Division II and Division III. Teams are ranked by an Elo-style rating—not by polls, reputation, or winning margin.</p>
+<p class="sub">A résumé-first ranking of teams across FBS, FCS, Division II and Division III. Signature wins carry extra weight, but every game matters: consistency, opponent quality, game location and winning margin all shape the rating.</p>
 <section class="panel">
 <div class="controls">
 <input id="search" type="search" placeholder="Search for a team…" aria-label="Search teams">
@@ -36,13 +36,15 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 <div class="stat"><strong id="updated">—</strong><span>Last updated</span></div>
 </div>
 <section class="panel">
-<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Team</th><th>Division / tier</th><th>Conference</th><th class="num">Record</th><th class="num">Rating</th><th class="num">Games</th></tr></thead><tbody id="rows"><tr><td colspan="7" class="note">No results loaded yet.</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Team</th><th>Division / tier</th><th>Conference</th><th class="num">Record</th><th class="num">Power rating</th><th class="num">SOS</th><th class="num">Avg. margin</th><th class="num">Signature wins</th></tr></thead><tbody id="rows"><tr><td colspan="9" class="note">No results loaded yet.</td></tr></tbody></table></div>
 </section>
 <section class="panel note">
-<h2>How the model works</h2>
-<p>Each completed game updates both teams' Elo ratings based only on the winner and loser. The score and margin of victory are deliberately ignored: a one-point win and a 50-point win count the same.</p>
-<p>Starting ratings are transparent structural assumptions: FBS power-conference teams start at 1800, other FBS teams at 1600, FCS at 1300, and Division II/III at 900. These are priors—not historical poll rankings—and game results move ratings from there. Home-field advantage is 55 rating points; the Elo update factor is 32.</p>
-<p>Opponent strength propagates through the schedule as teams' ratings change. Rankings depend on the completeness and classification of the source data, and should not be treated as an official poll. D-II and D-III are currently assigned the same starting rating.</p>
+<h2>How the résumé model works</h2>
+<p><b>1. Quality wins are the biggest differentiator.</b> Beating a highly rated opponent earns more than beating a struggling one. Upset wins are especially valuable, and signature wins are counted separately.</p>
+<p><b>2. Consistency still matters.</b> Every win and loss changes the rating. A team with a strong overall record will generally rank well, but a weak loss can outweigh an ordinary win.</p>
+<p><b>3. Margin is a supporting factor.</b> Larger wins help, but the margin adjustment is capped so running up the score cannot overwhelm the résumé.</p>
+<p><b>4. Location matters.</b> Road wins receive more credit than equivalent home wins; neutral-site games receive no home-field adjustment.</p>
+<p>Ratings begin close together across divisions so division labels do not predetermine the rankings. Cross-division comparisons remain less certain when teams have few or no common opponents. This is an independent model, not an official poll.</p>
 </section>
 <div class="footer">Data source: CollegeFootballData API, accessed through a private Cloudflare Worker. This page is an independent, non-commercial project.</div>
 </main>
@@ -63,78 +65,72 @@ function tierFor(classification,conference){
  if(c==='ii/iii')return 'Division II/III';
  return 'Other';
 }
+// Small starting offsets provide context without deciding the rankings in advance.
 function baseRating(tier){
- if(tier==='FBS Power Conference')return 1800;
- if(tier==='FBS Other')return 1600;
- if(tier==='FCS')return 1300;
- return 900;
+ if(tier==='FBS Power Conference')return 1530;
+ if(tier==='FBS Other')return 1515;
+ if(tier==='FCS')return 1500;
+ return 1485;
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function addTeam(map,id,name,classification,conference){
  if(id==null||!name)return;
- const key=String(id);
- const tier=tierFor(classification,conference);
- if(!map.has(key)){
-  map.set(key,{id:key,name:cleanName(name),tier,conference:cleanName(conference||''),rating:baseRating(tier),wins:0,losses:0,games:0});
- }
+ const key=String(id),tier=tierFor(classification,conference);
+ if(!map.has(key))map.set(key,{id:key,name:cleanName(name),tier,conference:cleanName(conference||''),rating:baseRating(tier),wins:0,losses:0,games:0,pointsFor:0,pointsAgainst:0,opponents:[],signatureWins:0});
 }
+function clamp(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
 async function load(){
- $('refresh').disabled=true;
- $('status').textContent='Connecting to CollegeFootballData…';
- $('rows').innerHTML='<tr><td colspan="7" class="note">Loading game results…</td></tr>';
+ $('refresh').disabled=true;$('status').textContent='Connecting to CollegeFootballData…';
+ $('rows').innerHTML='<tr><td colspan="9" class="note">Loading game results…</td></tr>';
  try{
   const response=await fetch(API_URL+'?year='+SEASON,{headers:{'Accept':'application/json'}});
-  if(!response.ok){
-   let detail='HTTP '+response.status;
-   try{const err=await response.json();if(err.details)detail+=' — '+err.details;else if(err.error)detail+=' — '+err.error;}catch{}
-   throw new Error(detail);
-  }
-  const payload=await response.json();
-  if(!Array.isArray(payload.games))throw new Error('The data service response did not contain a games array.');
-  const allGames=payload.games;
-  const teamMap=new Map();
-  for(const g of allGames){
-   addTeam(teamMap,g.homeId,g.homeTeam,g.homeClassification,g.homeConference);
-   addTeam(teamMap,g.awayId,g.awayTeam,g.awayClassification,g.awayConference);
-  }
+  if(!response.ok){let detail='HTTP '+response.status;try{const err=await response.json();if(err.details)detail+=' — '+err.details;else if(err.error)detail+=' — '+err.error;}catch{}throw new Error(detail);}
+  const payload=await response.json();if(!Array.isArray(payload.games))throw new Error('The data service response did not contain a games array.');
+  const allGames=payload.games,teamMap=new Map();
+  for(const g of allGames){addTeam(teamMap,g.homeId,g.homeTeam,g.homeClassification,g.homeConference);addTeam(teamMap,g.awayId,g.awayTeam,g.awayClassification,g.awayConference);}
   const completed=allGames.filter(g=>g.completed===true&&g.homePoints!=null&&g.awayPoints!=null)
    .sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||'')));
-  let gamesUsed=0;
+  // First pass: ratings are adjusted for opponent strength, upsets, venue and a capped margin factor.
+  // Replaying the schedule twice lets later results refine how earlier opponents are valued.
+  for(let pass=0;pass<2;pass++){
+   if(pass===1){for(const t of teamMap.values()){t.rating=baseRating(t.tier);}}
+   for(const g of completed){
+    const home=teamMap.get(String(g.homeId)),away=teamMap.get(String(g.awayId));
+    if(!home||!away||home.id===away.id)continue;
+    const hp=Number(g.homePoints),ap=Number(g.awayPoints),margin=Math.abs(hp-ap);
+    if(hp===ap)continue;
+    const homeWin=hp>ap,homeAdvantage=g.neutralSite?0:55;
+    const expectedHome=1/(1+Math.pow(10,(away.rating-(home.rating+homeAdvantage))/400));
+    const actualHome=homeWin?1:0;
+    // Margin adds at most 30% to a result; it cannot turn one blowout into several wins.
+    const marginMultiplier=1+0.30*(1-Math.exp(-margin/21));
+    const change=44*marginMultiplier*(actualHome-expectedHome);
+    home.rating+=change;away.rating-=change;
+   }
+  }
+  // Final résumé statistics use the finished opponent ratings, not the teams' starting tiers.
+  for(const t of teamMap.values()){t.wins=0;t.losses=0;t.games=0;t.pointsFor=0;t.pointsAgainst=0;t.opponents=[];t.signatureWins=0;}
   for(const g of completed){
    const home=teamMap.get(String(g.homeId)),away=teamMap.get(String(g.awayId));
    if(!home||!away||home.id===away.id)continue;
-   const homeWin=Number(g.homePoints)>Number(g.awayPoints);
-   const awayWin=Number(g.awayPoints)>Number(g.homePoints);
-   if(!homeWin&&!awayWin)continue;
-   const homeAdvantage=g.neutralSite?0:55;
-   const expectedHome=1/(1+Math.pow(10,(away.rating-(home.rating+homeAdvantage))/400));
-   const actualHome=homeWin?1:0;
-   const change=32*(actualHome-expectedHome);
-   home.rating+=change;away.rating-=change;
-   home.games++;away.games++;
-   if(homeWin){home.wins++;away.losses++;}else{away.wins++;home.losses++;}
-   gamesUsed++;
+   const hp=Number(g.homePoints),ap=Number(g.awayPoints);if(hp===ap)continue;
+   home.games++;away.games++;home.pointsFor+=hp;home.pointsAgainst+=ap;away.pointsFor+=ap;away.pointsAgainst+=hp;
+   home.opponents.push(away.rating);away.opponents.push(home.rating);
+   if(hp>ap){home.wins++;away.losses++;if(away.rating>=1580)home.signatureWins++;}
+   else{away.wins++;home.losses++;if(home.rating>=1580)away.signatureWins++;}
   }
-  teams=[...teamMap.values()].sort((a,b)=>b.rating-a.rating);
-  $('teamCount').textContent=teams.length.toLocaleString();
-  $('gameCount').textContent=gamesUsed.toLocaleString();
-  $('updated').textContent=new Date().toLocaleTimeString();
-  const source=payload.source||'CollegeFootballData';
-  $('status').textContent='Loaded '+teams.length+' teams from '+gamesUsed+' completed games for '+SEASON+' ('+source+').';
+  teams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0}))
+   .sort((a,b)=>b.rating-a.rating);
+  $('teamCount').textContent=teams.length.toLocaleString();$('gameCount').textContent=completed.length.toLocaleString();$('updated').textContent=new Date().toLocaleTimeString();
+  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games for '+SEASON+'. Ratings reward quality wins, consistency, location and capped margin.';
   render();
- }catch(err){
-  $('status').textContent='Could not load CollegeFootballData: '+err.message+'. Check the Worker and try refreshing.';
-  $('rows').innerHTML='<tr><td colspan="7" class="note">No data available. Try refreshing.</td></tr>';
- }finally{$('refresh').disabled=false;}
+ }catch(err){$('status').textContent='Could not load CollegeFootballData: '+err.message+'. Check the Worker and try refreshing.';$('rows').innerHTML='<tr><td colspan="9" class="note">No data available. Try refreshing.</td></tr>';}finally{$('refresh').disabled=false;}
 }
 function render(){
  const q=$('search').value.trim().toLowerCase(),d=$('division').value;
  const filtered=teams.filter(t=>(d==='All'||t.tier===d)&&t.name.toLowerCase().includes(q));
- $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.rating.toFixed(1)+'</td><td class="num">'+t.games+'</td></tr>').join('')||'<tr><td colspan="7" class="note">No matching teams.</td></tr>';
+ $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.rating.toFixed(1)+'</td><td class="num">'+t.sos.toFixed(0)+'</td><td class="num">'+(t.avgMargin>=0?'+':'')+t.avgMargin.toFixed(1)+'</td><td class="num">'+t.signatureWins+'</td></tr>').join('')||'<tr><td colspan="9" class="note">No matching teams.</td></tr>';
 }
-$('refresh').addEventListener('click',load);
-$('search').addEventListener('input',render);
-$('division').addEventListener('change',render);
-load();
+$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('division').addEventListener('change',render);load();
 </script>
 </body></html>
