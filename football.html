@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>College Football National Power Rankings</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1220;--panel:#121d30;--line:#263650;--muted:#9fb0c8;--text:#edf3fb;--accent:#62b5ff}
+:root{color-scheme:dark;--panel:#121d30;--line:#263650;--muted:#9fb0c8;--text:#edf3fb;--accent:#62b5ff}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1220,#101c30);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
 main{max-width:1120px;margin:0 auto;padding:42px 22px 64px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
 h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(--muted);max-width:760px;margin:0 0 26px}
@@ -28,7 +28,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 </select>
 <button id="refresh">Refresh 2026 results</button>
 </div>
-<div id="status" role="status">Press refresh to load completed games from ESPN's public scoreboard feed.</div>
+<div id="status" role="status">Press refresh to load completed games from the NCAA public scoreboard feed.</div>
 </section>
 <div class="stats">
 <div class="stat"><strong id="teamCount">—</strong><span>Teams ranked</span></div>
@@ -44,57 +44,111 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 <p>Starting ratings are transparent structural assumptions: FBS power-conference teams start at 1800, other FBS teams at 1600, FCS at 1300, and Division II/III at 900. These are priors—not historical poll rankings—and game results move ratings from there. Home-field advantage is 55 rating points; the Elo update factor is 32.</p>
 <p>Opponent strength propagates through the schedule as teams' ratings change. Rankings depend on the completeness and classification of the source data, and should not be treated as an official poll. D-II and D-III are currently assigned the same starting rating.</p>
 </section>
-<div class="footer">Data source: ESPN public college-football scoreboard feed. This page is an independent, non-commercial project.</div>
+<div class="footer">Data source: NCAA public scoreboard API (community-maintained NCAA.com data service). This page is an independent, non-commercial project.</div>
 </main>
 <script>
-const API='https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard';
-const START='20260820', END='20261231';
-const POWER=new Set(['ACC','Big 12','Big Ten','SEC']);
-const BASE={'FBS Power Conference':1800,'FBS Other':1600,'FCS':1300,'Division II':900,'Division III':900};
-const GROUPS=[['80','FBS'],['81','FCS'],['57','Division II'],['58','Division III']];
-let teams=[];
+const NCAA_API='https://ncaa-api.henrygd.me/scoreboard/football';
+const SEASON=2026;
+const WEEKS=Array.from({length:20},(_,i)=>String(i+1).padStart(2,'0'));
+const DIVISIONS=[
+ {slug:'fbs',label:'FBS',tier:'FBS Other'},
+ {slug:'fcs',label:'FCS',tier:'FCS'},
+ {slug:'d2',label:'Division II',tier:'Division II'},
+ {slug:'d3',label:'Division III',tier:'Division III'}
+];
+const POWER=new Set(['ACC','Atlantic Coast Conference','Big 12','Big 12 Conference','Big Ten','Big Ten Conference','Big 10','Southeastern Conference','SEC']);
+const CONF_NAMES={'acc':'Atlantic Coast Conference','big-ten':'Big Ten Conference','big-12':'Big 12 Conference','sec':'Southeastern Conference'};
 const $=id=>document.getElementById(id);
-function conferenceOf(team){const g=team.groups||{};return g.name||g.abbreviation||'';}
-function tierFor(group,team){if(group==='80'){return POWER.has(conferenceOf(team))?'FBS Power Conference':'FBS Other';}return group==='81'?'FCS':group==='57'?'Division II':'Division III';}
-async function fetchGroup(group,label){
- const url=API+'?'+new URLSearchParams({dates:START+'-'+END,groups:group,limit:'1000'});
- const response=await fetch(url);if(!response.ok)throw new Error(label+' feed returned HTTP '+response.status);
- return await response.json();
+let teams=[];
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function cleanName(s){return String(s||'').replace(/\s+/g,' ').trim();}
+function teamId(t){return String(t?.names?.seo||t?.names?.short||t?.names?.char6||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function teamName(t){return cleanName(t?.names?.full||t?.names?.short||t?.names?.char6||'Unknown team');}
+function teamConference(t){const c=t?.conferences?.[0]||{};const name=cleanName(c.conferenceName||'');const slug=String(c.conferenceSeo||'').toLowerCase();return name||CONF_NAMES[slug]||slug;}
+function isFinal(g){return ['final','f','complete','completed'].includes(String(g?.gameState||'').toLowerCase());}
+function safeDate(s){const d=new Date(s);return Number.isNaN(d.getTime())?'':d.toISOString();}
+async function fetchWeek(div,week){
+ const url=NCAA_API+'/'+div.slug+'/'+SEASON+'/'+week+'/all-conf';
+ let response;
+ for(let attempt=0;attempt<3;attempt++){
+  response=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(response.status===429){await wait(1200*(attempt+1));continue;}
+  break;
+ }
+ if(response.status===404)return [];
+ if(!response.ok)throw new Error(div.label+' week '+week+' returned HTTP '+response.status);
+ const payload=await response.json();
+ if(!Array.isArray(payload.games))throw new Error('Unexpected NCAA response for '+div.label+' week '+week+' (no games array).');
+ return payload.games.map(item=>item.game||item).filter(Boolean);
 }
+function recordTeamVotes(votes,raw,div){
+ const id=teamId(raw);if(!id)return;
+ if(!votes.has(id))votes.set(id,{id,name:teamName(raw),divisionVotes:{},conferenceVotes:{}});
+ const v=votes.get(id);v.name=teamName(raw)||v.name;
+ v.divisionVotes[div.slug]=(v.divisionVotes[div.slug]||0)+1;
+ const conf=teamConference(raw);if(conf)v.conferenceVotes[conf]=(v.conferenceVotes[conf]||0)+1;
+}
+function mostCommon(obj){return Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]?.[0]||'';}
+function tierForTeam(v){
+ const slug=mostCommon(v.divisionVotes);
+ const conf=mostCommon(v.conferenceVotes);
+ if(slug==='fbs')return POWER.has(conf)?'FBS Power Conference':'FBS Other';
+ return slug==='fcs'?'FCS':slug==='d2'?'Division II':'Division III';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function load(){
- $('refresh').disabled=true;$('status').textContent='Connecting to ESPN and loading the 2026 schedule…';
+ $('refresh').disabled=true;
+ $('status').textContent='Connecting to the NCAA scoreboard…';
  try{
-  const results=await Promise.all(GROUPS.map(([id,label])=>fetchGroup(id,label)));
-  const events=new Map();
-  results.forEach((data,i)=>(data.events||[]).forEach(ev=>events.set(String(ev.id),{ev,group:GROUPS[i][0]})));
-  const teamMap=new Map(),completed=[];
-  for(const {ev,group} of events.values()){
-   const comp=(ev.competitions||[])[0];if(!comp||!((comp.status||{}).type||{}).completed)continue;
-   const competitors=comp.competitors||[];if(competitors.length!==2)continue;
-   const parsed=[];
-   for(const item of competitors){
-    const t=item.team||{},id=String(t.id||'');if(!id)continue;
-    const tier=tierFor(group,t),conf=conferenceOf(t);
-    if(!teamMap.has(id))teamMap.set(id,{id,name:t.displayName||t.name||'Unknown',tier,conference:conf,rating:BASE[tier],wins:0,losses:0,games:0});
-    parsed.push({id,home:item.homeAway==='home',winner:!!item.winner});
+  const allGames=new Map(),votes=new Map();
+  let requestCount=0;
+  // 4 divisions × 20 season weeks. A short pause keeps us under the public API rate limit.
+  for(const div of DIVISIONS){
+   for(const week of WEEKS){
+    requestCount++;
+    $('status').textContent='Loading '+div.label+' · week '+Number(week)+' ('+requestCount+'/80)…';
+    const games=await fetchWeek(div,week);
+    for(const g of games){
+     const home=g.home,away=g.away;
+     if(!home||!away)continue;
+     recordTeamVotes(votes,home,div);recordTeamVotes(votes,away,div);
+     const id=String(g.gameID||g.id||'');
+     if(id&&!allGames.has(id))allGames.set(id,g);
+    }
+    await wait(425);
    }
-   if(parsed.length!==2)continue;const winner=parsed.find(x=>x.winner);
-   if(winner)completed.push({date:ev.date||'',teams:parsed,winner:winner.id});
+  }
+  const teamMap=new Map();
+  for(const v of votes.values()){
+   const tier=tierForTeam(v);
+   const base=tier==='FBS Power Conference'?1800:tier==='FBS Other'?1600:tier==='FCS'?1300:900;
+   teamMap.set(v.id,{id:v.id,name:v.name,tier,conference:mostCommon(v.conferenceVotes),rating:base,wins:0,losses:0,games:0});
+  }
+  const completed=[];
+  for(const g of allGames.values()){
+   if(!isFinal(g))continue;
+   const h=g.home,a=g.away,hid=teamId(h),aid=teamId(a);
+   if(!hid||!aid||!teamMap.has(hid)||!teamMap.has(aid))continue;
+   const homeWon=!!h.winner,awayWon=!!a.winner;
+   if(homeWon===awayWon)continue;
+   completed.push({date:safeDate(g.startDate),homeId:hid,awayId:aid,winner:homeWon?hid:aid});
   }
   completed.sort((a,b)=>a.date.localeCompare(b.date));
   for(const game of completed){
-   const [a,b]=game.teams,ta=teamMap.get(a.id),tb=teamMap.get(b.id),home=a.home?55:b.home?-55:0;
-   const expected=1/(1+Math.pow(10,(tb.rating-(ta.rating+home))/400));
-   const actual=game.winner===a.id?1:0,change=32*(actual-expected);
-   ta.rating+=change;tb.rating-=change;ta.games++;tb.games++;
-   if(actual){ta.wins++;tb.losses++;}else{tb.wins++;ta.losses++;}
+   const home=teamMap.get(game.homeId),away=teamMap.get(game.awayId);
+   const expectedHome=1/(1+Math.pow(10,(away.rating-(home.rating+55))/400));
+   const actualHome=game.winner===game.homeId?1:0,change=32*(actualHome-expectedHome);
+   home.rating+=change;away.rating-=change;home.games++;away.games++;
+   if(actualHome){home.wins++;away.losses++;}else{away.wins++;home.losses++;}
   }
   teams=[...teamMap.values()].sort((a,b)=>b.rating-a.rating);
-  $('teamCount').textContent=teams.length.toLocaleString();$('gameCount').textContent=completed.length.toLocaleString();
+  $('teamCount').textContent=teams.length.toLocaleString();
+  $('gameCount').textContent=completed.length.toLocaleString();
   $('updated').textContent=new Date().toLocaleTimeString();
-  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games. Sorted by power rating.';render();
+  $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed NCAA games across FBS, FCS, Division II and Division III.';
+  render();
  }catch(err){
-  $('status').textContent='Could not load ESPN: '+err.message+'. The browser may block the feed (CORS), or ESPN may be temporarily unavailable.';
+  $('status').textContent='Could not load NCAA data: '+err.message+'. The public NCAA data service may be busy or unavailable; please try again.';
   $('rows').innerHTML='<tr><td colspan="7" class="note">No data available. Try refreshing later.</td></tr>';
  }finally{$('refresh').disabled=false;}
 }
@@ -103,6 +157,8 @@ function render(){
  const filtered=teams.filter(t=>(d==='All'||t.tier===d)&&t.name.toLowerCase().includes(q));
  $('rows').innerHTML=filtered.map((t,i)=>'<tr><td class="rank">'+(i+1)+'</td><td class="team">'+escapeHtml(t.name)+'</td><td class="tier">'+escapeHtml(t.tier)+'</td><td class="tier">'+escapeHtml(t.conference||'—')+'</td><td class="num">'+t.wins+'-'+t.losses+'</td><td class="num">'+t.rating.toFixed(1)+'</td><td class="num">'+t.games+'</td></tr>').join('')||'<tr><td colspan="7" class="note">No matching teams.</td></tr>';
 }
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('division').addEventListener('change',render);
-</script></body></html>
+$('refresh').addEventListener('click',load);
+$('search').addEventListener('input',render);
+$('division').addEventListener('change',render);
+</script>
+</body></html>
