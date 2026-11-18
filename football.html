@@ -40,7 +40,8 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}.sub{color:var(
 </section>
 <section class="panel note">
 <h2>How this version ranks teams</h2>
-<p><b>Notre Dame:</b> Notre Dame receives the same starting-tier treatment as a Power Conference FBS team. Its ranking is then determined by its actual schedule and results, not a conference label.</p>
+<p><b>Division hierarchy:</b> Power-conference FBS teams (and Notre Dame) rank ahead of other FBS, followed by FCS, Division II and Division III. A lower-division team can jump a higher-division opponent only if it has a winning head-to-head record against that specific team. Without a direct result, the division hierarchy holds.</p>
+<p><b>Notre Dame:</b> Notre Dame receives the same top-tier treatment as a Power Conference FBS team. Its ranking is then determined by its actual schedule and results, not a conference label.</p>
 <p><b>Head-to-head:</b> When two teams have records within one win, a decisive head-to-head result is the first major tiebreaker. If the relevant results form a circular chain, the model reduces the direct head-to-head bonus and uses the recency of those games instead.</p>
 <p><b>Recent form:</b> Recent games count more than early-season games. A current winning streak receives an additional form bonus, allowing a hot 6–4 team to make a meaningful move without erasing its earlier losses.</p>
 <p><b>Résumé and consistency:</b> Quality wins earn more credit, losses to weak opponents cost more, and every game still contributes. Margin of victory is capped and used as a final dominance tiebreaker rather than allowing blowouts to overwhelm the résumé.</p>
@@ -72,6 +73,43 @@ function baseRating(tier){
  if(tier==='FBS Other')return 1515;
  if(tier==='FCS')return 1500;
  return 1485;
+}
+// National division hierarchy: Power FBS, other FBS, FCS, Division II, Division III.
+// A lower-tier team can jump a higher-tier opponent only when it has beaten that
+// opponent head-to-head during this season.
+function tierOrder(tier){
+ if(tier==='FBS Power Conference'||tier==='FBS Independent (Notre Dame)')return 0;
+ if(tier==='FBS Other')return 1;
+ if(tier==='FCS')return 2;
+ if(tier==='Division II'||tier==='Division II/III')return 3;
+ if(tier==='Division III')return 4;
+ return 5;
+}
+function applyDivisionHierarchy(sortedTeams){
+ const ranked=[...sortedTeams].sort((a,b)=>tierOrder(a.tier)-tierOrder(b.tier)||b.powerRating-a.powerRating);
+ // Process lower tiers from strongest to weakest. A team is promoted just above
+ // the highest-ranked higher-tier opponent it has a winning head-to-head record against.
+ for(const team of [...ranked].sort((a,b)=>tierOrder(a.tier)-tierOrder(b.tier)||b.powerRating-a.powerRating)){
+  const teamTier=tierOrder(team.tier);
+  if(teamTier===0||teamTier>=5)continue;
+  const opponentsWonAgainst=new Set();
+  for(const game of team.gameLog){
+   if(!game.won)continue;
+   const opponent=ranked.find(x=>x.id===game.oppId);
+   if(!opponent||tierOrder(opponent.tier)>=teamTier)continue;
+   const h2h=team.gameLog.filter(x=>x.oppId===opponent.id);
+   const wins=h2h.filter(x=>x.won).length;
+   const losses=h2h.length-wins;
+   if(wins>losses)opponentsWonAgainst.add(opponent.id);
+  }
+  if(!opponentsWonAgainst.size)continue;
+  const opponentIndexes=ranked.map((x,i)=>opponentsWonAgainst.has(x.id)?i:-1).filter(i=>i>=0);
+  if(!opponentIndexes.length)continue;
+  const target=Math.min(...opponentIndexes);
+  const current=ranked.findIndex(x=>x.id===team.id);
+  if(current>target){ranked.splice(current,1);ranked.splice(target,0,team);}
+ }
+ return ranked;
 }
 function clamp(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -206,8 +244,9 @@ async function load(){
    t.formBonus=recentNet*3.5+Math.min(28,streak*4.5);
   }
   calculateHeadToHead(teamMap);
-  teams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0,powerRating:1500+t.resumeScore+t.formBonus+t.h2hPoints}))
+  const scoredTeams=[...teamMap.values()].map(t=>({...t,sos:t.opponents.length?t.opponents.reduce((a,b)=>a+b,0)/t.opponents.length:1500,avgMargin:t.games?(t.pointsFor-t.pointsAgainst)/t.games:0,powerRating:1500+t.resumeScore+t.formBonus+t.h2hPoints}))
    .sort((a,b)=>b.powerRating-a.powerRating||b.h2hPoints-a.h2hPoints||b.formBonus-a.formBonus||b.avgMargin-a.avgMargin||b.wins-a.wins);
+  teams=applyDivisionHierarchy(scoredTeams);
   $('teamCount').textContent=teams.length.toLocaleString();$('gameCount').textContent=completed.length.toLocaleString();$('updated').textContent=new Date().toLocaleTimeString();
   $('status').textContent='Loaded '+teams.length+' teams from '+completed.length+' completed games. Head-to-head, recent form, résumé quality and dominance are included.';
   render();
