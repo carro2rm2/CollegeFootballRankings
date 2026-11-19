@@ -6,135 +6,351 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>College Football Top 25</title>
 <style>
-:root{color-scheme:dark;--gold:#f5c85b;--text:#f4f7fb;--muted:#aab8ca;--line:#293a53}
+:root {
+  --navy:#101d35;
+  --gold:#e0b64f;
+  --background:#f1f3f6;
+  --text:#172338;
+  --muted:#687589;
+}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1c3554,#0b1423 55%,#080e19);color:var(--text);font:16px/1.45 system-ui,sans-serif}
-main{max-width:850px;margin:auto;padding:38px 18px}
-header{text-align:center;padding-bottom:25px}
-.kicker{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.2em}
-h1{font-size:clamp(38px,7vw,62px);line-height:1.05;margin:12px 0}
-.subtitle{color:var(--muted);max-width:620px;margin:auto;font-size:14px}
-.pills{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:20px}
-.pill{background:#142238;border:1px solid var(--line);border-radius:30px;padding:7px 13px;color:var(--muted);font-size:11px}
-.panel{background:#111c2d;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 18px 50px #0005}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;padding:14px;background:#1a2a40;color:#b8c7d9;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-td{padding:12px 14px;border-top:1px solid #26364d}
-tbody tr:nth-child(-n+3){background:#26344a55}
-.rank{color:var(--gold);font-size:19px;font-weight:850;width:65px}
-.team{font-weight:750}
-.record,.rating{font-variant-numeric:tabular-nums}
-.rating{text-align:right;font-weight:750;color:#d9eaff}
-th:last-child{text-align:right}
-.actions{text-align:center;padding:25px 0 8px}
-a.button{display:inline-block;background:var(--gold);color:#17202c;text-decoration:none;font-weight:850;border-radius:10px;padding:13px 20px}
-a.button:hover{filter:brightness(1.1)}
-.note{text-align:center;color:var(--muted);font-size:12px;margin-top:13px}
-#status{text-align:center;color:var(--muted);font-size:12px;margin-top:15px}
-footer{text-align:center;color:#8292a8;font-size:11px;margin-top:25px}
-#source{position:absolute;left:-10000px;top:0;width:1200px;height:1000px;border:0}
-@media(max-width:520px){main{padding:25px 10px}td,th{padding:10px 8px}.rank{width:48px}.team{font-size:14px}}
-@media print{body{background:white;color:#111}main{padding:0}.panel{background:white;box-shadow:none;border:1px solid #bbb}th{background:#eee;color:#222}td{border-color:#ddd}.rank{color:#806000}.rating{color:#222}.actions,#status,footer,.pills{display:none}}
+body{
+  margin:0;padding:16px;background:var(--background);
+  color:var(--text);font-family:Arial,Helvetica,sans-serif
+}
+.page{max-width:1400px;margin:auto}
+header{
+  background:var(--navy);color:white;text-align:center;
+  padding:17px;border-bottom:5px solid var(--gold);
+  border-radius:12px;margin-bottom:14px
+}
+h1{margin:0;font-size:30px;letter-spacing:1px}
+.subtitle{color:#d7deea;font-size:13px;margin-top:6px}
+#status{text-align:center;color:var(--muted);font-size:13px;margin:12px}
+.grid{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px
+}
+.card{
+  min-width:0;min-height:105px;background:white;
+  border:1px solid #dce1e8;border-radius:10px;
+  padding:9px;display:flex;align-items:center;gap:9px;
+  box-shadow:0 2px 5px #101d3510
+}
+.rank{flex:0 0 25px;text-align:center;color:#9b7627;
+  font-size:19px;font-weight:800}
+.logo{
+  flex:0 0 48px;width:48px;height:48px;
+  object-fit:contain
+}
+.fallback{
+  flex:0 0 44px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy);color:white;display:flex;
+  align-items:center;justify-content:center;
+  font-size:12px;font-weight:bold
+}
+.info{min-width:0;flex:1}
+.name{font-weight:800;font-size:14px;line-height:1.2}
+.record{font-size:12px;color:var(--muted);margin-top:5px}
+.rating{font-size:12px;color:#9b7627;font-weight:700;margin-top:3px}
+footer{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin-top:15px;padding:10px 4px;
+  font-size:12px;color:var(--muted)
+}
+footer a{
+  background:var(--navy);color:white;text-decoration:none;
+  font-weight:bold;padding:10px 15px;border-radius:7px
+}
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  body{padding:8px}
+  h1{font-size:23px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .card{min-height:90px;padding:6px;gap:5px}
+  .logo{flex-basis:36px;width:36px;height:36px}
+  .fallback{flex-basis:34px;width:34px;height:34px}
+  .name{font-size:12px}
+  .rank{flex-basis:19px;font-size:16px}
+}
+@media print{
+  @page{size:landscape;margin:.3in}
+  body{padding:0;background:white}
+  .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+  .card{min-height:85px;box-shadow:none}
+  footer a{color:white}
+}
 </style>
 </head>
 <body>
-<main>
+<div class="page">
 <header>
- <div class="kicker">INDEPENDENT MODEL · 2026 SEASON</div>
- <h1>College Football<br>Top 25</h1>
- <p class="subtitle">
-  An independent national power ranking based on game results,
-  opponent strength, résumé quality, head-to-head and recent form.
- </p>
- <div class="pills">
-  <span class="pill">TOP 25 TEAMS</span>
-  <span class="pill">POWER RATINGS</span>
-  <span class="pill">NOT AN OFFICIAL POLL</span>
- </div>
+  <h1>COLLEGE FOOTBALL TOP 25</h1>
+  <div class="subtitle">Independent National Power Rankings · 2026 Season</div>
 </header>
 
-<section class="panel">
-<table>
-<thead>
-<tr><th>Rank</th><th>Team</th><th>Record</th><th>Power</th></tr>
-</thead>
-<tbody id="rows">
-<tr><td colspan="4">Loading the latest rankings…</td></tr>
-</tbody>
-</table>
-</section>
+<div id="status">Loading national rankings...</div>
+<main class="grid" id="rankings"></main>
 
-<div class="actions">
- <a class="button" href="football.html">VIEW FULL NATIONAL RANKINGS →</a>
- <div class="note">The complete rankings include every team and additional model statistics.</div>
+<footer>
+  <span>Independent College Football Power Rankings</span>
+  <a href="football.html">VIEW FULL NATIONAL RANKINGS →</a>
+</footer>
 </div>
 
-<div id="status">Connecting to rankings…</div>
-<footer>Independent College Football Power Rankings · 2026</footer>
-</main>
-
-<iframe id="source" src="football.html" title="Ranking data source"></iframe>
+<iframe id="source" src="football.html"
+ title="Full rankings data"
+ style="position:absolute;width:1px;height:1px;left:-9999px;border:0">
+</iframe>
 
 <script>
-const rows=document.getElementById('rows');
-const status=document.getElementById('status');
-const frame=document.getElementById('source');
+const rankings = document.getElementById("rankings");
+const status = document.getElementById("status");
+const frame = document.getElementById("source");
+
+/*
+ Direct ESPN image URLs. No ESPN team-directory fetch,
+ so browser CORS restrictions cannot block the lookup.
+ Teams without a mapping receive an initials fallback.
+*/
+const TEAM_IDS = {
+ "alabama":"333",
+ "georgia":"61",
+ "ohio state":"194",
+ "oregon":"2483",
+ "texas":"251",
+ "texas am":"245",
+ "oklahoma":"201",
+ "notre dame":"87",
+ "michigan":"130",
+ "penn state":"213",
+ "lsu":"99",
+ "louisiana state":"99",
+ "florida":"57",
+ "florida state":"52",
+ "miami":"2390",
+ "miami fl":"2390",
+ "clemson":"228",
+ "auburn":"2",
+ "tennessee":"2633",
+ "ole miss":"145",
+ "mississippi":"145",
+ "mississippi state":"344",
+ "arkansas":"8",
+ "kentucky":"96",
+ "south carolina":"2579",
+ "missouri":"142",
+ "vanderbilt":"238",
+ "wisconsin":"275",
+ "iowa":"2294",
+ "nebraska":"158",
+ "usc":"30",
+ "southern california":"30",
+ "ucla":"26",
+ "washington":"264",
+ "washington state":"265",
+ "oregon state":"204",
+ "arizona":"12",
+ "arizona state":"9",
+ "utah":"254",
+ "byu":"252",
+ "brigham young":"252",
+ "colorado":"38",
+ "kansas state":"2306",
+ "kansas":"2305",
+ "oklahoma state":"197",
+ "baylor":"239",
+ "tcu":"2628",
+ "texas christian":"2628",
+ "texas tech":"2641",
+ "houston":"248",
+ "cincinnati":"2132",
+ "west virginia":"277",
+ "ucf":"2116",
+ "central florida":"2116",
+ "usf":"58",
+ "south florida":"58",
+ "memphis":"235",
+ "tulane":"2655",
+ "smu":"2567",
+ "southern methodist":"2567",
+ "duke":"150",
+ "north carolina":"153",
+ "unc":"153",
+ "nc state":"152",
+ "north carolina state":"152",
+ "virginia tech":"259",
+ "virginia":"258",
+ "louisville":"97",
+ "pitt":"221",
+ "pittsburgh":"221",
+ "syracuse":"183",
+ "boston college":"103",
+ "wake forest":"154",
+ "georgia tech":"59",
+ "cal":"25",
+ "california":"25",
+ "stanford":"24",
+ "san diego state":"21",
+ "boise state":"68",
+ "fresno state":"278",
+ "air force":"2005",
+ "navy":"2426",
+ "army":"349",
+ "toledo":"2649",
+ "miami ohio":"193",
+ "ohio":"195",
+ "buffalo":"2084",
+ "northern illinois":"2459",
+ "ni u":"2459",
+ "bowling green":"189",
+ "western michigan":"2711",
+ "central michigan":"2117",
+ "eastern michigan":"2199",
+ "appalachian state":"2026",
+ "app state":"2026",
+ "coastal carolina":"324",
+ "james madison":"256",
+ "liberty":"2335",
+ "old dominion":"295",
+ "georgia southern":"290",
+ "troy":"2653",
+ "south alabama":"6",
+ "louisiana":"309",
+ "uab":"5",
+ "florida atlantic":"2226",
+ "fau":"2226",
+ "fiu":"2229",
+ "rice":"242",
+ "north texas":"249",
+ "utsa":"2636",
+ "texas san antonio":"2636",
+ "texas state":"326",
+ "charlotte":"2429",
+ "east carolina":"151",
+ "ecu":"151",
+ "tulsa":"202"
+};
+
+function normalize(value){
+ return String(value || "").toLowerCase()
+  .replace(/&/g,"and")
+  .replace(/[^a-z0-9 ]/g," ")
+  .replace(/\s+/g," ").trim();
+}
+
+function initials(name){
+ const words=String(name).replace(/[^a-zA-Z0-9 ]/g," ")
+  .trim().split(/\s+/).filter(Boolean);
+ return words.length===1
+  ? words[0].slice(0,3).toUpperCase()
+  : words.slice(0,3).map(x=>x[0]).join("").toUpperCase();
+}
+
+function makeLogo(name){
+ const wrap=document.createElement("div");
+ const id=TEAM_IDS[normalize(name)];
+
+ if(id){
+  const img=document.createElement("img");
+  img.className="logo";
+  img.alt=name+" logo";
+  img.src="https://a.espncdn.com/i/teamlogos/ncaa/500/"+id+".png";
+  img.onerror=()=> {
+   const fallback=document.createElement("div");
+   fallback.className="fallback";
+   fallback.textContent=initials(name);
+   img.replaceWith(fallback);
+  };
+  wrap.appendChild(img);
+ }else{
+  const fallback=document.createElement("div");
+  fallback.className="fallback";
+  fallback.textContent=initials(name);
+  wrap.appendChild(fallback);
+ }
+ return wrap;
+}
+
+function makeCard(team,index){
+ const card=document.createElement("article");
+ card.className="card";
+
+ const rank=document.createElement("div");
+ rank.className="rank";
+ rank.textContent=index+1;
+
+ const info=document.createElement("div");
+ info.className="info";
+
+ const name=document.createElement("div");
+ name.className="name";
+ name.textContent=team.name;
+
+ const record=document.createElement("div");
+ record.className="record";
+ record.textContent=team.record;
+
+ const rating=document.createElement("div");
+ rating.className="rating";
+ rating.textContent=team.rating ? "Power: "+team.rating : "";
+
+ info.append(name,record,rating);
+ card.append(rank,makeLogo(team.name),info);
+ rankings.appendChild(card);
+}
 
 let attempts=0;
 
-function loadTop25(){
+function loadRankings(){
  attempts++;
-
  try{
   const doc=frame.contentDocument;
-  const sourceRows=[...doc.querySelectorAll('#rows tr')];
+  if(!doc) throw new Error("Rankings page not ready");
 
-  const valid=sourceRows.filter(row=>
-   row.querySelectorAll('td').length>=10
-  );
+  const rows=[...doc.querySelectorAll("#rows tr")];
+  const teams=[];
 
-  if(valid.length===0){
+  for(const row of rows){
+   const cells=row.querySelectorAll("td");
+   if(cells.length<6) continue;
+
+   const name=cells[1].textContent.trim();
+   if(!name) continue;
+
+   teams.push({
+    name,
+    record:cells[4].textContent.trim(),
+    rating:cells[5].textContent.trim()
+   });
+  }
+
+  if(teams.length<25){
    if(attempts<60){
-    setTimeout(loadTop25,1000);
+    setTimeout(loadRankings,1000);
    }else{
-    status.textContent='Could not load rankings. Please try refreshing.';
+    status.textContent="Rankings did not load. Check football.html.";
    }
    return;
   }
 
-  const top=valid.slice(0,25);
-
-  rows.innerHTML=top.map((row,index)=>{
-   const cells=row.querySelectorAll('td');
-   const team=cells[1].textContent;
-   const record=cells[4].textContent;
-   const power=cells[5].textContent;
-
-   return `
-    <tr>
-     <td class="rank">${index+1}</td>
-     <td class="team">${escapeHTML(team)}</td>
-     <td class="record">${escapeHTML(record)}</td>
-     <td class="rating">${escapeHTML(power)}</td>
-    </tr>`;
-  }).join('');
-
-  status.textContent='Updated from the full rankings page.';
+  rankings.innerHTML="";
+  teams.slice(0,25).forEach(makeCard);
+  status.textContent="Updated from the full national rankings.";
  }catch(error){
-  status.textContent='Unable to read the full rankings. Check that both pages are on the same website.';
+  if(attempts<60){
+   setTimeout(loadRankings,1000);
+  }else{
+   status.textContent="Could not read the full rankings. Please refresh.";
+  }
  }
 }
 
-function escapeHTML(value){
- return String(value).replace(/[&<>"']/g,char=>({
-  '&':'&amp;','<':'&lt;','>':'&gt;',
-  '"':'&quot;',"'":'&#39;'
- }[char]));
-}
-
-frame.addEventListener('load',()=>{
+frame.addEventListener("load",()=>{
  attempts=0;
- loadTop25();
+ loadRankings();
 });
 </script>
 </body>
