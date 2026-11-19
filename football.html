@@ -3,600 +3,515 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Top 25 College Football Rankings</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>College Football National Power Rankings</title>
 <style>
-:root {
-    --navy: #101d35;
-    --gold: #e0b64f;
-    --background: #f1f3f6;
-    --text: #172338;
-    --muted: #687589;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    padding: 18px;
-    background: var(--background);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.page {
-    max-width: 1250px;
-    margin: 0 auto;
-}
-
-header {
-    background: var(--navy);
-    color: white;
-    border-bottom: 5px solid var(--gold);
-    border-radius: 12px;
-    padding: 17px 22px;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 30px;
-    letter-spacing: 1px;
-}
-
-.subtitle {
-    color: #d7deea;
-    margin-top: 6px;
-    font-size: 13px;
-}
-
-#status {
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    margin: 10px 0;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.team-card {
-    min-width: 0;
-    min-height: 112px;
-    background: white;
-    border: 1px solid #dce1e8;
-    border-radius: 10px;
-    padding: 10px 8px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    box-shadow: 0 2px 5px rgba(16, 29, 53, 0.06);
-}
-
-.rank {
-    flex: 0 0 25px;
-    color: #9b7627;
-    font-size: 19px;
-    font-weight: 800;
-    text-align: center;
-}
-
-.logo-wrap {
-    flex: 0 0 52px;
-    width: 52px;
-    height: 52px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.team-logo {
-    max-width: 52px;
-    max-height: 52px;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.logo-fallback {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: var(--navy);
-    color: white;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    font-size: 13px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.team-info {
-    min-width: 0;
-    flex: 1;
-}
-
-.team-name {
-    font-weight: 800;
-    font-size: 14px;
-    line-height: 1.2;
-    overflow-wrap: anywhere;
-}
-
-.team-record {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.team-rating {
-    color: #9b7627;
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 3px;
-}
-
-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-top: 15px;
-    padding: 12px 4px;
-    font-size: 12px;
-    color: var(--muted);
-}
-
-footer a {
-    background: var(--navy);
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 10px 16px;
-    border-radius: 7px;
-}
-
-footer a:hover {
-    background: #263d61;
-}
-
-@media (max-width: 850px) {
-    body {
-        padding: 10px;
-    }
-
-    .grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 560px) {
-    header h1 {
-        font-size: 23px;
-    }
-
-    .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px;
-    }
-
-    .team-card {
-        min-height: 95px;
-        padding: 7px 5px;
-        gap: 5px;
-    }
-
-    .rank {
-        flex-basis: 20px;
-        font-size: 16px;
-    }
-
-    .logo-wrap {
-        flex-basis: 38px;
-        width: 38px;
-        height: 38px;
-    }
-
-    .team-logo {
-        max-width: 38px;
-        max-height: 38px;
-    }
-
-    .logo-fallback {
-        width: 36px;
-        height: 36px;
-    }
-
-    .team-name {
-        font-size: 12px;
-    }
-}
-
-@media print {
-    @page {
-        size: landscape;
-        margin: 0.3in;
-    }
-
-    body {
-        padding: 0;
-        background: white;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-    }
-
-    .page {
-        max-width: none;
-    }
-
-    header {
-        margin-bottom: 10px;
-        padding: 12px;
-    }
-
-    header h1 {
-        font-size: 25px;
-    }
-
-    .grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 7px;
-    }
-
-    .team-card {
-        min-height: 90px;
-        box-shadow: none;
-    }
-
-    footer a {
-        color: white !important;
-    }
-}
+:root{color-scheme:dark;--panel:#121d30;--line:#263650;--muted:#9fb0c8;--text:#edf3fb;--accent:#62b5ff}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#0b1220,#101c30);color:var(--text);font:15px/1.5 system-ui,sans-serif}
+main{max-width:1220px;margin:auto;padding:38px 20px 60px}
+.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0}
+.sub{color:var(--muted);max-width:850px;margin:0 0 24px}
+.panel{background:rgba(18,29,48,.94);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+input,select,button{background:#0b1526;color:var(--text);border:1px solid #354964;border-radius:9px;padding:11px 13px;font:inherit}
+input{flex:1;min-width:210px}
+button{background:#1769aa;border-color:#277fca;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+#status{color:var(--muted);font-size:13px;margin-top:13px}
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat{background:#0b1526;border:1px solid var(--line);border-radius:11px;padding:12px 16px;min-width:140px}
+.stat strong{display:block;font-size:23px}
+.stat span{color:var(--muted);font-size:12px}
+.table-wrap{overflow:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;min-width:1000px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);position:sticky;top:0;background:#121d30}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.rank{color:var(--accent);font-weight:800}
+.team{font-weight:650}
+.tier,.note{color:var(--muted);font-size:13px}
+.note h2{font-size:17px;color:var(--text);margin:0 0 7px}
+.note p{margin:7px 0}
+.footer{color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:600px){main{padding:26px 13px}.panel{padding:13px}}
 </style>
 </head>
-
 <body>
-<div class="page">
+<main>
+<div class="eyebrow">Independent model · 2026 season</div>
+<h1>College Football<br>National Power Rankings</h1>
+<p class="sub">A national power ranking built from game results, opponent-adjusted team strength, résumé quality, head-to-head results and recent form. This is an independent model, not an official poll.</p>
 
-    <header>
-        <h1>COLLEGE FOOTBALL TOP 25</h1>
-        <div class="subtitle">National Power Rankings • 2026 Season</div>
-    </header>
+<section class="panel">
+<div class="controls">
+<input id="search" type="search" placeholder="Search for a team…" aria-label="Search teams">
+<select id="division" aria-label="Filter division">
+<option value="All">All divisions</option>
+<option>FBS Power Conference</option>
+<option>FBS Independent (Notre Dame)</option>
+<option>FBS Other</option>
+<option>FCS</option>
+<option>Division II</option>
+<option>Division III</option>
+<option>Division II/III</option>
+</select>
+<button id="refresh">Refresh 2026 results</button>
+</div>
+<div id="status" role="status">Loading completed games…</div>
+</section>
 
-    <div id="status">Loading national rankings and team logos...</div>
-
-    <main class="grid" id="rankings"></main>
-
-    <footer>
-        <span>Independent College Football Power Rankings</span>
-        <a href="football.html">VIEW FULL NATIONAL RANKINGS →</a>
-    </footer>
-
+<div class="stats">
+<div class="stat"><strong id="teamCount">—</strong><span>Teams ranked</span></div>
+<div class="stat"><strong id="gameCount">—</strong><span>Completed games included</span></div>
+<div class="stat"><strong id="updated">—</strong><span>Last updated</span></div>
 </div>
 
-<!-- Loads the full rankings page in the background -->
-<iframe
-    id="rankingsFrame"
-    src="football.html"
-    title="Full rankings data"
-    style="position:absolute;width:1px;height:1px;left:-9999px;border:0;">
-</iframe>
+<section class="panel">
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Team</th>
+<th>Division / tier</th>
+<th>Conference</th>
+<th class="num">Record</th>
+<th class="num">Power rating</th>
+<th class="num">Elo</th>
+<th class="num">SOS</th>
+<th class="num">Avg. margin</th>
+<th class="num">Recent form</th>
+</tr>
+</thead>
+<tbody id="rows">
+<tr><td colspan="10" class="note">No results loaded yet.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="panel note">
+<h2>How the rankings work</h2>
+<p><b>Final score:</b> The ranking combines résumé score, recent form, head-to-head and opponent-adjusted Elo strength. Elo is explicitly included in the final power rating; it is not merely calculated and discarded.</p>
+<p><b>Game strength:</b> Elo is updated chronologically using opponent rating, a 55-point home-field advantage and a modest margin-of-victory adjustment. The final ranking includes 55% of each team's Elo movement from its division starting point.</p>
+<p><b>Résumé:</b> Quality wins are rewarded. Road wins receive a 3-point venue edge over equivalent home wins; home losses receive an additional penalty and road losses receive relief. Blowout losses and shutouts are penalized.</p>
+<p><b>Head-to-head:</b> Direct results between teams with similar records can shift their order. Winning on the road is treated as stronger evidence than the same margin at home. Cycles are dampened to avoid circular-result inflation.</p>
+<p><b>Recent form:</b> The six most recent games count more heavily, with a capped winning-streak bonus.</p>
+<p><b>Division hierarchy:</b> Power-conference FBS and Notre Dame are listed ahead of other FBS, followed by FCS, Division II and Division III. A lower-tier team can move ahead of an adjacent higher-tier opponent when it has a winning head-to-head record against that team.</p>
+</section>
+
+<div class="footer">Data source: CollegeFootballData API through a Cloudflare Worker. Independent project.</div>
+</main>
 
 <script>
-const ESPN_TEAMS_URL =
-    "https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams?limit=500";
+const API_URL='https://college-football-api.rmcarroll604.workers.dev/games';
+const SEASON=2026;
 
-const rankingsContainer = document.getElementById("rankings");
-const statusElement = document.getElementById("status");
-const frame = document.getElementById("rankingsFrame");
+const POWER=/^(acc|atlantic coast conference|big 12|big 12 conference|big ten|big ten conference|sec|southeastern conference)$/i;
 
-let rankingsLoaded = false;
-let logoMap = new Map();
+const $=id=>document.getElementById(id);
+let teams=[];
 
-function normalize(name) {
-    return String(name || "")
-        .toLowerCase()
-        .replace(/&/g, "and")
-        .replace(/[^a-z0-9]/g, "");
+const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+function tierFor(cls,conf,name){
+ const c=String(cls||'').toLowerCase().trim();
+ const f=clean(conf);
+
+ if(c==='fbs'&&/notre dame/i.test(name||''))return 'FBS Independent (Notre Dame)';
+ if(c==='fbs')return POWER.test(f)?'FBS Power Conference':'FBS Other';
+ if(c==='fcs')return 'FCS';
+ if(c==='ii')return 'Division II';
+ if(c==='iii')return 'Division III';
+ if(c==='ii/iii')return 'Division II/III';
+ return 'Other';
 }
 
-function getInitials(name) {
-    const words = String(name || "")
-        .replace(/[^a-zA-Z0-9 ]/g, "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-
-    if (words.length === 1) {
-        return words[0].slice(0, 3).toUpperCase();
-    }
-
-    return words.slice(0, 3)
-        .map(word => word[0])
-        .join("")
-        .toUpperCase();
+function tierOrder(t){
+ return t==='FBS Power Conference'||t==='FBS Independent (Notre Dame)'?0:
+ t==='FBS Other'?1:
+ t==='FCS'?2:
+ t==='Division II'||t==='Division II/III'?3:
+ t==='Division III'?4:5;
 }
 
-/* Some ranking names differ from ESPN's team display names. */
-const aliases = {
-    "miamioh": "miamiohio",
-    "miamifl": "miamiflorida",
-    "olemiss": "mississippi",
-    "lsu": "louisianastate",
-    "usc": "southerncalifornia",
-    "ucf": "centralflorida",
-    "smu": "southernmethodist",
-    "tcu": "texaschristian",
-    "byu": "brighamyoung",
-    "utsa": "texassanantonio",
-    "unlv": "nevada las vegas",
-    "appstate": "appalachianstate",
-    "ncstate": "northcarolinastate",
-    "pitt": "pittsburgh",
-    "olemissrebels": "mississippi",
-    "uconn": "connecticut",
-    "umass": "massachusetts"
-};
-
-function findLogo(teamName) {
-    const key = normalize(teamName);
-    const lookup = aliases[key] || key;
-
-    if (logoMap.has(lookup)) {
-        return logoMap.get(lookup);
-    }
-
-    /* Try partial matching if exact matching fails. */
-    for (const [espnName, logo] of logoMap.entries()) {
-        if (
-            espnName.length > 4 &&
-            (espnName.includes(lookup) || lookup.includes(espnName))
-        ) {
-            return logo;
-        }
-    }
-
-    return null;
+function base(t){
+ return t==='FBS Power Conference'||t==='FBS Independent (Notre Dame)'?1530:
+ t==='FBS Other'?1515:
+ t==='FCS'?1500:1485;
 }
 
-async function loadEspnLogos() {
-    try {
-        const response = await fetch(ESPN_TEAMS_URL);
-
-        if (!response.ok) {
-            throw new Error("ESPN response was not successful");
-        }
-
-        const data = await response.json();
-
-        const entries =
-            data?.sports?.[0]?.leagues?.[0]?.teams || [];
-
-        for (const entry of entries) {
-            const team = entry.team || entry;
-
-            if (!team.displayName && !team.name) {
-                continue;
-            }
-
-            const names = [
-                team.displayName,
-                team.shortDisplayName,
-                team.name,
-                team.abbreviation
-            ].filter(Boolean);
-
-            const logo =
-                team.logos?.[0]?.href ||
-                team.logos?.[0]?.url;
-
-            if (!logo) {
-                continue;
-            }
-
-            for (const name of names) {
-                logoMap.set(normalize(name), logo);
-            }
-        }
-
-        return true;
-
-    } catch (error) {
-        console.warn("Could not load ESPN logos:", error);
-        return false;
-    }
+function esc(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[c]));
 }
 
-function showLogo(teamName, logoUrl) {
-    const wrap = document.createElement("div");
-    wrap.className = "logo-wrap";
-
-    const fallback = document.createElement("div");
-    fallback.className = "logo-fallback";
-    fallback.textContent = getInitials(teamName);
-
-    if (logoUrl) {
-        const img = document.createElement("img");
-        img.className = "team-logo";
-        img.src = logoUrl;
-        img.alt = teamName + " logo";
-        img.loading = "eager";
-
-        img.onerror = function () {
-            img.style.display = "none";
-            fallback.style.display = "flex";
-        };
-
-        wrap.appendChild(img);
-    } else {
-        fallback.style.display = "flex";
-    }
-
-    wrap.appendChild(fallback);
-    return wrap;
+function recency(date,latest){
+ if(!date||!latest)return 1;
+ let days=Math.max(0,(latest-date)/86400000);
+ return clamp(Math.pow(.5,days/60),.48,1.35);
 }
 
-function createCard(team, index) {
-    const card = document.createElement("div");
-    card.className = "team-card";
-
-    const rank = document.createElement("div");
-    rank.className = "rank";
-    rank.textContent = index + 1;
-
-    const logo = showLogo(team.name, findLogo(team.name));
-
-    const info = document.createElement("div");
-    info.className = "team-info";
-
-    const name = document.createElement("div");
-    name.className = "team-name";
-    name.textContent = team.name;
-
-    const record = document.createElement("div");
-    record.className = "team-record";
-    record.textContent = team.record || "Record unavailable";
-
-    const rating = document.createElement("div");
-    rating.className = "team-rating";
-    rating.textContent = team.rating
-        ? "Power: " + team.rating
-        : "";
-
-    info.appendChild(name);
-    info.appendChild(record);
-    info.appendChild(rating);
-
-    card.appendChild(rank);
-    card.appendChild(logo);
-    card.appendChild(info);
-
-    return card;
+function pathExists(graph,start,target,seen=new Set()){
+ if(start===target)return true;
+ if(seen.has(start))return false;
+ seen.add(start);
+ for(const n of graph.get(start)||[]){
+  if(pathExists(graph,n,target,seen))return true;
+ }
+ return false;
 }
 
-/*
- * Reads the actual rankings table from football.html.
- * Expected columns:
- * 1 = Team
- * 4 = Record
- * 5 = Power Rating
- */
-function readRankings() {
-    try {
-        const doc = frame.contentDocument;
+function h2hBonus(map){
+ const graph=new Map([...map.keys()].map(id=>[id,new Set()]));
+ const pairs=new Map();
 
-        if (!doc || !doc.body) {
-            return false;
-        }
+ for(const a of map.values()){
+  for(const g of a.log){
+   const b=map.get(g.opp);
+   if(!b||a.id>=b.id)continue;
 
-        let rowsContainer = doc.querySelector("#rows");
+   const key=a.id+'|'+b.id;
+   if(pairs.has(key))continue;
 
-        if (!rowsContainer) {
-            rowsContainer = doc.querySelector("table tbody");
-        }
+   const rows=a.log.filter(x=>x.opp===b.id);
+   const wa=rows.filter(x=>x.won).length;
+   const wb=rows.length-wa;
 
-        if (!rowsContainer) {
-            return false;
-        }
+   let edge=0,w=0;
+   for(const r of rows){
+    edge+=r.neutralMargin*r.weight;
+    w+=r.weight;
+   }
 
-        const rows = Array.from(
-            rowsContainer.querySelectorAll("tr")
-        );
+   pairs.set(key,{a,b,wa,wb,edge,w});
 
-        const teams = [];
+   if(wa>wb)graph.get(a.id).add(b.id);
+   else if(wb>wa)graph.get(b.id).add(a.id);
+  }
+ }
 
-        for (const row of rows) {
-            const cells = Array.from(row.querySelectorAll("td"));
+ for(const p of pairs.values()){
+  if(p.wa===p.wb)continue;
 
-            if (cells.length < 6) {
-                continue;
-            }
+  const aw=p.wa>p.wb;
+  const winner=aw?p.a:p.b;
+  const loser=aw?p.b:p.a;
+  const edge=aw?p.edge:-p.edge;
 
-            const teamName = cells[1].innerText.trim();
+  const bonus=!pathExists(graph,loser.id,winner.id)
+   ?clamp(12+(edge/(p.w||1))*.65,6,24)
+   :clamp(edge*.25,-6,6);
 
-            if (!teamName) {
-                continue;
-            }
-
-            teams.push({
-                name: teamName,
-                record: cells[4].innerText.trim(),
-                rating: cells[5].innerText.trim()
-            });
-        }
-
-        if (teams.length < 25) {
-            return false;
-        }
-
-        rankingsContainer.innerHTML = "";
-
-        teams.slice(0, 25).forEach((team, index) => {
-            rankingsContainer.appendChild(
-                createCard(team, index)
-            );
-        });
-
-        rankingsLoaded = true;
-        statusElement.textContent =
-            "Rankings loaded • Top 25 teams";
-
-        return true;
-
-    } catch (error) {
-        console.warn("Waiting for rankings table:", error);
-        return false;
-    }
+  winner.h2h+=bonus;
+  loser.h2h-=bonus;
+ }
 }
 
-async function startPage() {
-    /* Start loading logos while the rankings page loads. */
-    const logoPromise = loadEspnLogos();
+function applyHierarchy(arr){
+ const out=[...arr].sort((a,b)=>
+  tierOrder(a.tier)-tierOrder(b.tier)||b.power-a.power
+ );
 
-    let attempts = 0;
-    const maxAttempts = 60;
+ for(let i=1;i<out.length;i++){
+  const low=out[i],high=out[i-1];
 
-    const timer = setInterval(async () => {
-        attempts++;
+  if(tierOrder(low.tier)<=tierOrder(high.tier)||tierOrder(low.tier)>=5)continue;
 
-        if (readRankings()) {
-            clearInterval(timer);
+  const games=low.log.filter(g=>g.opp===high.id);
+  const wins=games.filter(g=>g.won).length;
 
-            await logoPromise;
-
-            /* Rebuild cards now that logo data is available. */
-            readRankings();
-            return;
-        }
-
-        if (attempts >= maxAttempts) {
-            clearInterval(timer);
-
-            statusElement.textContent =
-                "Unable to read the rankings table. Please refresh or check the full rankings page.";
-
-            console.error(
-                "Could not find enough ranking rows in football.html."
-            );
-        }
-    }, 1000);
+  if(games.length&&wins>games.length-wins){
+   [out[i-1],out[i]]=[low,high];
+  }
+ }
+ return out;
 }
 
-frame.addEventListener("load", startPage);
+async function load(){
+ $('refresh').disabled=true;
+ $('status').textContent='Connecting to the game data service…';
+ $('rows').innerHTML='<tr><td colspan="10" class="note">Loading…</td></tr>';
 
-/* Also start if the iframe already loaded. */
-if (frame.contentDocument?.readyState === "complete") {
-    startPage();
+ try{
+  const res=await fetch(API_URL+'?year='+SEASON,{
+   headers:{Accept:'application/json'}
+  });
+
+  if(!res.ok)throw Error('HTTP '+res.status);
+
+  const payload=await res.json();
+  if(!Array.isArray(payload.games))throw Error('Response did not contain a games array');
+
+  const all=payload.games;
+  const map=new Map();
+
+  function add(id,name,cls,conf){
+   if(id==null||!name)return;
+   id=String(id);
+
+   if(!map.has(id)){
+    const tier=tierFor(cls,conf,name);
+    map.set(id,{
+     id,name:clean(name),tier,
+     conference:clean(conf)||'Independent',
+     elo:base(tier),
+     wins:0,losses:0,games:0,
+     pf:0,pa:0,opps:[],log:[],
+     resume:0,h2h:0,form:0,streak:0
+    });
+   }
+  }
+
+  for(const g of all){
+   add(g.homeId,g.homeTeam,g.homeClassification,g.homeConference);
+   add(g.awayId,g.awayTeam,g.awayClassification,g.awayConference);
+  }
+
+  const games=all.filter(g=>
+   g.completed===true&&g.homePoints!=null&&g.awayPoints!=null
+  ).sort((a,b)=>
+   String(a.startDate||'').localeCompare(String(b.startDate||''))
+  );
+
+  const ds=games.map(g=>new Date(g.startDate)).filter(d=>!isNaN(d));
+  const latest=ds.length
+   ?new Date(Math.max(...ds.map(d=>d.getTime())))
+   :null;
+
+  /*
+   * CHANGED: Elo is updated chronologically.
+   * Each result changes both teams' ratings.
+   */
+  for(const g of games){
+   const h=map.get(String(g.homeId));
+   const a=map.get(String(g.awayId));
+
+   if(!h||!a||h.id===a.id)continue;
+
+   const hp=+g.homePoints;
+   const ap=+g.awayPoints;
+
+   if(hp===ap)continue;
+
+   const d=new Date(g.startDate);
+   const wt=recency(isNaN(d)?null:d,latest);
+   const margin=Math.abs(hp-ap);
+   const ha=g.neutralSite?0:55;
+
+   const expected=1/(1+Math.pow(
+    10,(a.elo-(h.elo+ha))/400
+   ));
+
+   const actual=hp>ap?1:0;
+   const mult=1+.25*(1-Math.exp(-margin/22));
+
+   const change=34*wt*mult*(actual-expected);
+
+   h.elo+=change;
+   a.elo-=change;
+  }
+
+  for(const t of map.values()){
+   t.wins=0;t.losses=0;t.games=0;
+   t.pf=0;t.pa=0;t.opps=[];t.log=[];
+   t.resume=0;t.h2h=0;t.form=0;t.streak=0;
+  }
+
+  /*
+   * Résumé scoring.
+   * Road wins get +3 relative to home wins.
+   * Home losses receive an additional penalty.
+   * Road losses receive relief.
+   */
+  for(const g of games){
+   const h=map.get(String(g.homeId));
+   const a=map.get(String(g.awayId));
+
+   if(!h||!a||h.id===a.id)continue;
+
+   const hp=+g.homePoints;
+   const ap=+g.awayPoints;
+
+   if(hp===ap)continue;
+
+   const margin=Math.abs(hp-ap);
+   const neutral=!!g.neutralSite;
+   const d=new Date(g.startDate);
+   const wt=recency(isNaN(d)?null:d,latest);
+   const homeWon=hp>ap;
+
+   h.games++;a.games++;
+   h.pf+=hp;h.pa+=ap;
+   a.pf+=ap;a.pa+=hp;
+
+   h.opps.push(a.elo);
+   a.opps.push(h.elo);
+
+   /*
+    * Correct neutral-equivalent winning margin:
+    * home win = actual margin - 3
+    * road win = actual margin + 3
+    * neutral game = actual margin
+    */
+   const winnerNeutralMargin=margin+(neutral?0:(homeWon?-3:3));
+
+   const addLog=(team,opp,won,nm)=>{
+    team.log.push({
+     opp:opp.id,won,weight:wt,date:d,neutralMargin:nm
+    });
+   };
+
+   if(homeWon){
+    h.wins++;a.losses++;
+
+    const quality=clamp((a.elo-1500)*.10,-8,20);
+    const mb=Math.min(3,margin/18);
+
+    h.resume+=(14+quality+mb+(neutral?1:0))*wt;
+
+    const weak=clamp((1500-h.elo)*.10,0,10);
+    const blow=Math.min(8,Math.max(0,margin-10)/8);
+    const shut=ap===0?6:0;
+
+    a.resume+=(
+     -18+
+     clamp((h.elo-1500)*.07,-6,8)-
+     weak-blow-shut-
+     (neutral?0:3)
+    )*wt;
+
+    addLog(h,a,true,winnerNeutralMargin);
+    addLog(a,h,false,-winnerNeutralMargin);
+
+   }else{
+    a.wins++;h.losses++;
+
+    const quality=clamp((h.elo-1500)*.10,-8,20);
+    const mb=Math.min(3,margin/18);
+
+    a.resume+=(14+quality+mb+(neutral?1:3))*wt;
+
+    const weak=clamp((1500-a.elo)*.10,0,10);
+    const blow=Math.min(8,Math.max(0,margin-10)/8);
+    const shut=hp===0?6:0;
+
+    h.resume+=(
+     -18+
+     clamp((a.elo-1500)*.07,-6,8)-
+     weak-blow-shut-
+     (neutral?0:3)
+    )*wt;
+
+    addLog(a,h,true,winnerNeutralMargin);
+    addLog(h,a,false,-winnerNeutralMargin);
+   }
+  }
+
+  // Recent form and winning streak.
+  for(const t of map.values()){
+   const ordered=[...t.log].sort((a,b)=>
+    (b.date?.getTime()||0)-(a.date?.getTime()||0)
+   );
+
+   const recent=ordered.slice(0,6);
+
+   for(const g of ordered){
+    if(g.won)t.streak++;
+    else break;
+   }
+
+   const net=recent.reduce(
+    (s,g)=>s+(g.won?1:-1)*g.weight,0
+   );
+
+   t.form=net*2.5+Math.min(12,t.streak*2);
+  }
+
+  h2hBonus(map);
+
+  const scored=[...map.values()].map(t=>{
+   const sos=t.opps.length
+    ?t.opps.reduce((a,b)=>a+b,0)/t.opps.length
+    :1500;
+
+   const avg=t.games?(t.pf-t.pa)/t.games:0;
+
+   /*
+    * CRITICAL FIX:
+    * Elo now contributes directly to the final ranking.
+    * Previously it was calculated but omitted from power.
+    */
+   const eloComponent=(t.elo-base(t.tier))*.55;
+
+   return {
+    ...t,sos,avg,eloComponent,
+    power:1500+t.resume+t.form+t.h2h+eloComponent
+   };
+  }).sort((a,b)=>
+   b.power-a.power||b.wins-a.wins
+  );
+
+  teams=applyHierarchy(scored);
+
+  $('teamCount').textContent=teams.length.toLocaleString();
+  $('gameCount').textContent=games.length.toLocaleString();
+  $('updated').textContent=new Date().toLocaleTimeString();
+
+  $('status').textContent=
+   'Loaded '+teams.length+' teams from '+games.length+
+   ' completed games. Elo is included in the final power score.';
+
+  render();
+
+ }catch(e){
+  $('status').textContent=
+   'Could not load results: '+e.message+
+   '. Check the Worker and refresh.';
+
+  $('rows').innerHTML=
+   '<tr><td colspan="10" class="note">No data available. Try refreshing.</td></tr>';
+
+ }finally{
+  $('refresh').disabled=false;
+ }
 }
+
+function render(){
+ const q=$('search').value.trim().toLowerCase();
+ const d=$('division').value;
+
+ const filtered=teams.filter(t=>
+  (d==='All'||t.tier===d)&&
+  t.name.toLowerCase().includes(q)
+ );
+
+ $('rows').innerHTML=filtered.map((t,i)=>
+  '<tr>'+
+  '<td class="rank">'+(i+1)+'</td>'+
+  '<td class="team">'+esc(t.name)+'</td>'+
+  '<td class="tier">'+esc(t.tier)+'</td>'+
+  '<td class="tier">'+esc(t.conference)+'</td>'+
+  '<td class="num">'+t.wins+'-'+t.losses+'</td>'+
+  '<td class="num">'+t.power.toFixed(1)+'</td>'+
+  '<td class="num">'+t.elo.toFixed(0)+'</td>'+
+  '<td class="num">'+t.sos.toFixed(0)+'</td>'+
+  '<td class="num">'+(t.avg>=0?'+':'')+t.avg.toFixed(1)+'</td>'+
+  '<td class="num">'+(t.streak?'W'+t.streak:'—')+'</td>'+
+  '</tr>'
+ ).join('')||
+ '<tr><td colspan="10" class="note">No matching teams.</td></tr>';
+}
+
+$('refresh').addEventListener('click',load);
+$('search').addEventListener('input',render);
+$('division').addEventListener('change',render);
+
+load();
 </script>
-
 </body>
 </html>
